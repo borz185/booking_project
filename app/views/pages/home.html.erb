@@ -1,0 +1,238 @@
+<!-- Шапка -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Лого -->
+      <div class="flex-shrink-0 flex items-center">
+        <a href="/" class="text-2xl font-bold text-primary">
+          <i class="fas fa-hotel mr-2"></i>booking.ru
+        </a>
+      </div>
+      
+      <!-- Меню -->
+      <nav class="hidden md:flex space-x-8">
+        <a href="/hotels" class="text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition">
+          <i class="fas fa-bed mr-1"></i>Отели
+        </a>
+        <a href="/favorites" class="text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition">
+          <i class="fas fa-heart mr-1"></i>Избранное
+        </a>
+      </nav>
+      
+      <!-- Кнопки рег/авт -->
+      <div class="flex items-center space-x-4">
+        <a href="/login" class="text-gray-700 hover:text-primary font-medium transition">
+          Войти
+        </a>
+        <a href="/signup" class="bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md">
+          Регистрация
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Основной блок -->
+<section class="bg-gradient-to-br from-green-400 via-green-300 to-cyan-300 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-primary mb-4">
+        Ооооочень много отелей!
+      </h1>
+    </div>
+    
+    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="flex-1">
+        <p class="text-3xl md:text-4xl font-bold text-primary mb-8">
+          Забронировать отпуск поможет booking!
+        </p>
+        <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl leading-relaxed">
+          Более 2 700 000 отелей по всему миру. Лучшие цены, мгновенное подтверждение 
+          и круглосуточная поддержка. Найдите идеальный отель за несколько минут!
+        </p>
+        <button class="bg-primary text-white text-xl font-bold px-10 py-4 rounded-full hover:bg-blue-700 transition shadow-xl transform hover:scale-105">
+          <i class="fas fa-search mr-2"></i>ОТЕЛИ
+        </button>
+      </div>
+      
+      <div class="flex-1 flex justify-center">
+        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop" 
+             alt="Hotel" 
+             class="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-300">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Блок подписки -->
+<section class="bg-gray-100 py-16">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="flex flex-col md:flex-row">
+        <div class="md:w-1/3">
+          <img src="https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=400&h=400&fit=crop" 
+               alt="Island" 
+               class="w-full h-full object-cover">
+        </div>
+        <div class="md:w-2/3 p-8 md:p-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-3">
+            Путешествуйте выгоднее!
+          </h2>
+          <p class="text-gray-600 mb-6">
+            Узнавайте первыми о выгодных ценах и спецпредложениях.
+          </p>
+          
+          <form class="flex flex-col sm:flex-row gap-3">
+            <input type="email" 
+                   placeholder="example@mail.ru" 
+                   class="flex-1 px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <button type="submit" 
+                    class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md">
+              Подписаться
+            </button>
+          </form>
+          
+          <label class="flex items-center mt-4 text-sm text-gray-600">
+            <input type="checkbox" class="mr-2 rounded border-gray-300 text-primary focus:ring-primary">
+            Я согласен получать рассылки с новостями, рекламой и спецпредложениями
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Фото блок -->
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= image_tag "hotelsbrands.png", alt: "Hotel Brands", class: "w-full h-auto" %>
+  </div>
+</section>
+
+<!-- Блок преимущества -->
+<section class="py-16 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
+        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-ruble-sign text-2xl text-secondary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">
+          Низкие цены
+        </h3>
+        <p class="text-gray-600 leading-relaxed">
+          Мы работаем напрямую с тысячами отелей, десятками поставщиков и можем контролировать цены на номера. Поэтому у нас всегда есть выгодные предложения на большинство направлений.
+        </p>
+      </div>
+      
+      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
+        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-globe text-2xl text-primary"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">
+          Отели по всему миру
+        </h3>
+        <p class="text-gray-600 leading-relaxed">
+          У нас более 2700000 вариантов размещения по всему миру. Это отели, хостелы, апартаменты, виллы и даже кемпинги. В любой сезон вы найдёте то, что подходит именно вам.
+        </p>
+      </div>
+      
+      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
+        <div class="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-headset text-2xl text-accent"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">
+          Заботливая поддержка 24/7
+        </h3>
+        <p class="text-gray-600 leading-relaxed">
+          Операторы поддержки помогут с выбором отеля и бронированием. Если вопрос возник в поездке, оператор будет на связи и найдёт решение в кратчайший срок.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Подвал -->
+<footer class="bg-gray-800 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h4 class="text-lg font-bold mb-4">Компания</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Компания и команда</a></li>
+          <li><a href="#" class="hover:text-white transition">Контакты</a></li>
+          <li><a href="#" class="hover:text-white transition">Вакансии</a></li>
+          <li><a href="#" class="hover:text-white transition">Для прессы</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Клиентам</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">База знаний</a></li>
+          <li><a href="#" class="hover:text-white transition">Служба поддержки</a></li>
+          <li><a href="#" class="hover:text-white transition">Блог о путешествиях</a></li>
+          <li><a href="#" class="hover:text-white transition">Популярные направления</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Партнёрам</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Объектам размещения</a></li>
+          <li><a href="#" class="hover:text-white transition">Турагентствам</a></li>
+          <li><a href="#" class="hover:text-white transition">Корпоративным клиентам</a></li>
+          <li><a href="#" class="hover:text-white transition">Рекламодателям</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Мы в соцсетях</h4>
+        <div class="flex space-x-4 mb-6">
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-telegram-plane"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-vk"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
+        
+        <h4 class="text-lg font-bold mb-4">Мобильные приложения</h4>
+        <div class="space-y-2">
+          <a href="#" class="block bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition">
+            <i class="fab fa-apple mr-2"></i>App Store
+          </a>
+          <a href="#" class="block bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition">
+            <i class="fab fa-google-play mr-2"></i>Google Play
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-700 pt-8 mt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <h4 class="font-bold mb-2">Безопасность платежей</h4>
+          <p class="text-gray-400 text-sm">Надёжная защита данных от ведущих платёжных систем.</p>
+        </div>
+        <div class="flex space-x-4">
+          <i class="fab fa-cc-visa text-3xl text-gray-400"></i>
+          <i class="fab fa-cc-mastercard text-3xl text-gray-400"></i>
+          <i class="fas fa-credit-card text-3xl text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-700 pt-6 mt-6 text-center text-gray-400 text-sm">
+      <p>&copy; 2026 Booking.ru. Все права защищены.</p>
+      <div class="mt-2 space-x-4">
+        <a href="#" class="hover:text-white transition">Политика конфиденциальности</a>
+        <a href="#" class="hover:text-white transition">Условия использования</a>
+      </div>
+    </div>
+  </div>
+</footer>
