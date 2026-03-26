@@ -12,7 +12,7 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.primary_key :user_id
       t.string :username, null: false
       t.string :email, null: false
-      t.string :password_hash, null: false
+      t.string :password_digest, null: false
       t.string :phone
       t.string :role, default: 'user'
       t.boolean :has_visa, default: false

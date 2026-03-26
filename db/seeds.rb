@@ -1,3 +1,4 @@
+# Очищаем данные
 Payment.delete_all
 Booking.delete_all
 Room.delete_all
@@ -10,7 +11,8 @@ puts "Данные очищены..."
 admin = User.create!(
   username: 'admin',
   email: 'admin@hotel.com',
-  password_hash: 'hash_admin_123',
+  password: 'password123',
+  password_confirmation: 'password123',
   phone: '+79991111111',
   role: 'admin',
   has_visa: false
@@ -19,7 +21,8 @@ admin = User.create!(
 masha = User.create!(
   username: 'mashylkaaaa',
   email: 'masha@example.com',
-  password_hash: 'hash_user_123',
+  password: 'password123',
+  password_confirmation: 'password123',
   phone: '+79990000000',
   role: 'user',
   has_visa: false
@@ -28,7 +31,8 @@ masha = User.create!(
 petr = User.create!(
   username: 'petrovich',
   email: 'petr@example.com',
-  password_hash: 'hash_petr_123',
+  password: 'password123',
+  password_confirmation: 'password123',
   phone: '+79991112233',
   role: 'user',
   has_visa: true
@@ -37,7 +41,8 @@ petr = User.create!(
 anna = User.create!(
   username: 'anna_smith',
   email: 'anna@example.com',
-  password_hash: 'hash_anna_123',
+  password: 'password123',
+  password_confirmation: 'password123',
   phone: '+79994445566',
   role: 'user',
   has_visa: false

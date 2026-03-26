@@ -2,31 +2,64 @@
 <header class="bg-white shadow-sm sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
-      <!-- Лого -->
+      <!-- Логотип -->
       <div class="flex-shrink-0 flex items-center">
-        <a href="/" class="text-2xl font-bold text-primary">
+        <%= link_to root_path, class: "text-2xl font-bold text-primary" do %>
           <i class="fas fa-hotel mr-2"></i>booking.ru
-        </a>
+        <% end %>
       </div>
       
       <!-- Меню -->
       <nav class="hidden md:flex space-x-8">
-        <a href="/hotels" class="text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition">
+        <%= link_to hotels_path, class: "text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition" do %>
           <i class="fas fa-bed mr-1"></i>Отели
-        </a>
-        <a href="/favorites" class="text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition">
-          <i class="fas fa-heart mr-1"></i>Избранное
-        </a>
+        <% end %>
+        <% if logged_in? %>
+          <%= link_to bookings_path, class: "text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition" do %>
+            <i class="fas fa-calendar-check mr-1"></i>Бронирования
+          <% end %>
+        <% end %>
       </nav>
       
-      <!-- Кнопки рег/авт -->
+      <!-- Кнопки входа/профиль -->
       <div class="flex items-center space-x-4">
-        <a href="/login" class="text-gray-700 hover:text-primary font-medium transition">
-          Войти
-        </a>
-        <a href="/signup" class="bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md">
-          Регистрация
-        </a>
+        <% if logged_in? %>
+          <!-- Пользователь вошел -->
+          <div class="relative inline-block group">
+            <button class="flex items-center space-x-2 text-gray-700 hover:text-primary font-medium transition">
+              <i class="fas fa-user-circle text-xl"></i>
+              <span class="hidden md:inline"><%= current_user.username %></span>
+              <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            
+            <div class="absolute right-0 pt-2 invisible opacity-0 transition-all duration-200 ease-in-out group-hover:visible group-hover:opacity-100 hover:visible hover:opacity-100">
+              <!-- Выпадающее меню -->
+              <div class="w-48 bg-white rounded-lg shadow-lg py-2">
+                <%= link_to bookings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" do %>
+                  <i class="fas fa-calendar-check mr-2"></i>Мои бронирования
+                <% end %>
+                <% if admin? %>
+                  <div class="border-t border-gray-200 my-1"></div>
+                  <span class="block px-4 py-2 text-sm text-gray-500">
+                    <i class="fas fa-shield-alt mr-2"></i>Админ: <%= current_user.role %>
+                  </span>
+                <% end %>
+                <div class="border-t border-gray-200 my-1"></div>
+                <%= button_to logout_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100", form: { class: "w-full" } do %>
+                  <i class="fas fa-sign-out-alt mr-2"></i>Выйти
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <!-- Пользователь не вошел -->
+          <%= link_to login_path, class: "text-gray-700 hover:text-primary font-medium transition" do %>
+            Войти
+          <% end %>
+          <%= link_to signup_path, class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md" do %>
+            Регистрация
+          <% end %>
+        <% end %>
       </div>
     </div>
   </div>
