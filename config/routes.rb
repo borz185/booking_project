@@ -1,15 +1,22 @@
 Rails.application.routes.draw do
-  get "auth/signup"
-  get "auth/login"
   root "pages#home"
   
-  # Аутентификация
-  get "signup", to: "auth#signup"
-  post "signup", to: "auth#register"
-  get "login", to: "auth#login"
-  post "login", to: "auth#authenticate"
-  get "logout", to: "auth#logout"
+  # Регистрация
+  get "signup", to: "registrations#new"
+  post "signup", to: "registrations#create"
   
+  # Вход/выход
+  get "login", to: "sessions#new"
+  post "login", to: "sessions#create"
+  delete "logout", to: "sessions#destroy"
+  
+  # Бронирования
+    resources :bookings, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+      member do
+        post :cancel
+      end
+    end
+
   # Основные разделы
   get "hotels", to: "pages#hotels"
   get "favorites", to: "pages#favorites"

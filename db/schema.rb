@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_19_010049) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_235712) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,7 +33,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_010049) do
     t.integer "user_id", null: false
     t.index ["created_at"], name: "index_bookings_on_created_at"
     t.index ["room_id", "check_in_date", "check_out_date"], name: "index_bookings_on_room_id_and_check_in_date_and_check_out_date"
-    t.index ["room_id", "check_in_date"], name: "idx_prevent_double_booking", unique: true, where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying])::text[]))"
+    t.index ["room_id", "check_in_date"], name: "idx_prevent_double_booking", unique: true, where: "((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('confirmed'::character varying)::text]))"
     t.index ["room_id"], name: "index_bookings_on_room_id"
     t.index ["status"], name: "index_bookings_on_status"
     t.index ["user_id"], name: "index_bookings_on_user_id"
@@ -100,7 +100,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_010049) do
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.boolean "has_visa", default: false
-    t.string "password_hash", null: false
+    t.string "password_digest", null: false
     t.string "phone"
     t.string "role", default: "user"
     t.datetime "updated_at", null: false
