@@ -1,12 +1,5 @@
 class CreateBookings < ActiveRecord::Migration[7.0]
   def change
-    execute <<-SQL
-      DO $$ BEGIN
-        CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    SQL
     
     create_table :bookings, id: false do |t|
       t.primary_key :booking_id

@@ -1,20 +1,5 @@
 class CreatePayments < ActiveRecord::Migration[7.0]
   def change
-    execute <<-SQL
-      DO $$ BEGIN
-        CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'failed', 'refunded');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    SQL
-    
-    execute <<-SQL
-      DO $$ BEGIN
-        CREATE TYPE payment_method AS ENUM ('card', 'cash');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    SQL
     
     create_table :payments, id: false do |t|
       t.primary_key :payment_id

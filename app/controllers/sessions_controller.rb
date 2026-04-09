@@ -4,9 +4,13 @@ class SessionsController < ApplicationController
   end
   
   def create
-    user = User.find_by(email: params[:email]&.downcase)
+    # Нормализация email (lowercase + strip)
+    email = params[:email]&.downcase&.strip
+    password = params[:password]
+
+    user = User.find_by(email: email)
     
-    if user&.authenticate(params[:password])
+    if user&.authenticate(password)
       # Успешный вход
       session[:user_id] = user.user_id
       session[:user_role] = user.role

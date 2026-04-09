@@ -1,12 +1,5 @@
 class CreateUsers < ActiveRecord::Migration[7.0]
   def change
-    execute <<-SQL
-      DO $$ BEGIN
-        CREATE TYPE user_role AS ENUM ('admin', 'user');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    SQL
     
     create_table :users, id: false do |t|
       t.primary_key :user_id
