@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "rooms/index"
   root "pages#home"
   
   # Регистрация
@@ -9,9 +10,14 @@ Rails.application.routes.draw do
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+
+  #Маршрут для номеров отеля
+  resources :hotels, only: [] do
+    resources :rooms, only: [:index], path: 'rooms'
+  end
   
   # Бронирования
-    resources :bookings, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    resources :bookings, only: [:index, :show] do
       member do
         post :cancel
       end

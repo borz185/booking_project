@@ -1,0 +1,538 @@
+<%# Helper метод для склонения существительных (русский язык) %>
+<% def pluralize_ru(count, one, two, five)
+  remainder = count % 100
+  if remainder >= 11 && remainder <= 14
+    five
+  else
+    case count % 10
+    when 1 then one
+    when 2..4 then two
+    else five
+    end
+  end
+end %>
+
+<!-- Шапка -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Логотип -->
+      <div class="flex-shrink-0 flex items-center">
+        <%= link_to root_path, class: "text-2xl font-bold text-primary" do %>
+          <i class="fas fa-hotel mr-2"></i>booking.ru
+        <% end %>
+      </div>
+      
+      <!-- Меню -->
+      <nav class="hidden md:flex space-x-8">
+        <%= link_to hotels_path, class: "text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition" do %>
+          <i class="fas fa-bed mr-1"></i>Отели
+        <% end %>
+        <% if logged_in? %>
+          <%= link_to bookings_path, class: "text-gray-700 hover:text-primary px-3 py-2 text-medium font-medium transition" do %>
+            <i class="fas fa-calendar-check mr-1"></i>Бронирования
+          <% end %>
+        <% end %>
+      </nav>
+      
+      <!-- Кнопки входа/профиль -->
+      <div class="flex items-center space-x-4">
+        <% if logged_in? %>
+          <!-- Пользователь вошел -->
+          <div class="relative inline-block group">
+            <button class="flex items-center space-x-2 text-gray-700 hover:text-primary font-medium transition">
+              <i class="fas fa-user-circle text-xl"></i>
+              <span class="hidden md:inline"><%= current_user.username %></span>
+              <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            
+            <div class="absolute right-0 pt-2 invisible opacity-0 transition-all duration-200 ease-in-out group-hover:visible group-hover:opacity-100 hover:visible hover:opacity-100">
+              <!-- Выпадающее меню -->
+              <div class="w-48 bg-white rounded-lg shadow-lg py-2">
+                <%= link_to bookings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" do %>
+                  <i class="fas fa-calendar-check mr-2"></i>Мои бронирования
+                <% end %>
+                <% if admin? %>
+                  <div class="border-t border-gray-200 my-1"></div>
+                  <span class="block px-4 py-2 text-sm text-gray-500">
+                    <i class="fas fa-shield-alt mr-2"></i>Админ: <%= current_user.role %>
+                  </span>
+                <% end %>
+                <div class="border-t border-gray-200 my-1"></div>
+                <%= button_to logout_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100", form: { class: "w-full" } do %>
+                  <i class="fas fa-sign-out-alt mr-2"></i>Выйти
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <!-- Пользователь не вошел -->
+          <%= link_to login_path, class: "text-gray-700 hover:text-primary font-medium transition" do %>
+            Войти
+          <% end %>
+          <%= link_to signup_path, class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md" do %>
+            Регистрация
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Основной контент страницы номеров -->
+<main class="bg-gray-50 min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Заголовок отеля -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900">
+        <%= @hotel.name %>
+      </h1>
+      <p class="text-gray-600 mt-2 flex items-center">
+        <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
+        <%= @hotel.city %>, <%= @hotel.country %>
+        <span class="mx-2 text-gray-300">•</span>
+        <span class="flex items-center">
+          <% @hotel.stars.times do %><i class="fas fa-star text-yellow-400 text-sm"></i><% end %>
+          <% (5 - @hotel.stars).times do %><i class="far fa-star text-gray-300 text-sm"></i><% end %>
+        </span>
+      </p>
+      <% if @hotel.visa_required %>
+        <span class="inline-flex items-center mt-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm">
+          <i class="fas fa-passport mr-1"></i>Требуется виза
+        </span>
+      <% end %>
+    </div>
+    
+    <!-- Информация об отеле -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <p class="text-gray-700 mb-4"><%= @hotel.description %></p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+        <p><i class="fas fa-home mr-2 text-primary"></i><%= @hotel.address %></p>
+        <p><i class="fas fa-phone mr-2 text-primary"></i><%= @hotel.phone %></p>
+      </div>
+    </div>
+    
+    <!-- Заголовок раздела номеров -->
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+      <i class="fas fa-bed mr-2 text-primary"></i>Доступные номера
+    </h2>
+    
+    <!-- Список номеров -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @rooms.each do |room| %>
+        <!-- Карточка номера -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          
+          <!-- Фото номера (заглушка) -->
+          <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+            <i class="fas fa-door-open text-4xl text-gray-400"></i>
+          </div>
+          
+          <!-- Информация о номере -->
+          <div class="p-6">
+            
+            <!-- Название и номер -->
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <h3 class="text-lg font-bold text-gray-900"><%= room.room_type %></h3>
+                <p class="text-sm text-gray-500">Номер <%= room.room_number %></p>
+              </div>
+              <!-- Статус доступности -->
+              <% if room.is_available %>
+                <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                  <i class="fas fa-check mr-1"></i>Свободен
+                </span>
+              <% else %>
+                <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">
+                  <i class="fas fa-times mr-1"></i>Занят
+                </span>
+              <% end %>
+            </div>
+            
+            <!-- Описание -->
+            <p class="text-gray-700 text-sm mb-4 line-clamp-2"><%= room.description %></p>
+            
+            <!-- Характеристики -->
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-users mr-2 text-primary w-4"></i>
+                <span>До <%= room.capacity %> <%= pluralize_ru(room.capacity, 'гостя', 'гостей', 'гостей') %></span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-ruble-sign mr-2 text-primary w-4"></i>
+                <span><%= number_to_currency(room.price_per_night, unit: "₽", precision: 0) %> / ночь</span>
+              </div>
+            </div>
+            
+            <!-- Услуги -->
+            <% if room.amenities.any? %>
+              <div class="mb-4">
+                <p class="text-xs text-gray-500 mb-2">Включено:</p>
+                <div class="flex flex-wrap gap-1">
+                  <% room.amenities.first(4).each do |amenity| %>
+                    <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                      <%= amenity %>
+                    </span>
+                  <% end %>
+                  <% if room.amenities.size > 4 %>
+                    <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                      +<%= room.amenities.size - 4 %> ещё
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            
+            <!-- Кнопка забронировать -->
+            <% if room.is_available && logged_in? %>
+              <button type="button" 
+                  onclick="openBookingModal(<%= room.id %>, '<%= room.room_type %>', <%= room.price_per_night %>, '<%= room.room_number %>')"
+                  class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center">
+                <i class="fas fa-calendar-plus mr-2"></i>Забронировать
+              </button>
+            <% elsif room.is_available %>
+              <%= link_to login_path(return_to: request.original_fullpath), 
+                  class: "w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center" do %>
+                <i class="fas fa-sign-in-alt mr-2"></i>Войти для брони
+              <% end %>
+            <% else %>
+              <button disabled 
+                  class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg font-medium cursor-not-allowed flex items-center justify-center">
+                <i class="fas fa-lock mr-2"></i>Недоступен
+              </button>
+            <% end %>
+            
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Если номеров нет -->
+    <% if @rooms.empty? %>
+      <div class="text-center py-16 bg-white rounded-xl shadow-md">
+        <i class="fas fa-bed text-6xl text-gray-300 mb-4"></i>
+        <p class="text-xl text-gray-600">В этом отеле пока нет доступных номеров</p>
+        <p class="text-gray-500 mt-2">Попробуйте выбрать другой отель</p>
+        <%= link_to hotels_path, class: "mt-4 inline-block text-primary hover:underline" do %>
+          <i class="fas fa-arrow-left mr-1"></i>Вернуться к отелям
+        <% end %>
+      </div>
+    <% end %>
+    
+    <!-- Кнопка назад -->
+    <div class="mt-8">
+      <%= link_to hotels_path, class: "inline-flex items-center text-primary hover:underline" do %>
+        <i class="fas fa-arrow-left mr-1"></i>Вернуться к списку отелей
+      <% end %>
+    </div>
+    
+  </div>
+</main>
+
+<!-- Модальное окно бронирования -->
+<div id="bookingModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <!-- Затемнение фона -->
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="closeBookingModal()"></div>
+  
+  <!-- Контент модального окна -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all w-full max-w-lg">
+      
+      <!-- Заголовок модального окна -->
+      <div class="bg-gradient-to-r from-primary to-blue-600 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white" id="modal-title">
+            <i class="fas fa-calendar-check mr-2"></i>Бронирование номера
+          </h3>
+          <button type="button" onclick="closeBookingModal()" class="text-white hover:text-gray-200 transition">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <p class="text-blue-100 mt-1 text-sm" id="modalRoomInfo"></p>
+      </div>
+      
+      <!-- Форма бронирования -->
+      <div class="px-6 py-6">
+        <form id="bookingForm" class="space-y-5">
+          
+          <!-- Даты заезда и выезда -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="checkIn" class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fas fa-calendar-alt mr-1 text-primary"></i>Заезд
+              </label>
+              <input type="date" id="checkIn" name="check_in" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  min="<%= Date.today %>">
+            </div>
+            <div>
+              <label for="checkOut" class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fas fa-calendar-check mr-1 text-primary"></i>Выезд
+              </label>
+              <input type="date" id="checkOut" name="check_out" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  min="<%= Date.today %>">
+            </div>
+          </div>
+          
+          <!-- Количество гостей -->
+          <div>
+            <label for="guests" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-users mr-1 text-primary"></i>Количество гостей
+            </label>
+            <input type="number" id="guests" name="guests" min="1" max="10" value="2" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                onchange="calculateTotal()">
+          </div>
+          
+          <!-- Расчет стоимости -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-gray-600">Цена за ночь:</span>
+              <span class="font-medium" id="pricePerNight">0 ₽</span>
+            </div>
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-gray-600">Количество ночей:</span>
+              <span class="font-medium" id="nightsCount">0</span>
+            </div>
+            <div class="border-t border-gray-200 pt-2 mt-2">
+              <div class="flex justify-between">
+                <span class="text-gray-900 font-bold">Итого:</span>
+                <span class="text-primary font-bold text-lg" id="totalPrice">0 ₽</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Контактные данные -->
+          <div>
+            <label for="guestName" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-user mr-1 text-primary"></i>ФИО гостя
+            </label>
+            <input type="text" id="guestName" name="guest_name" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="Иванов Иван Иванович">
+          </div>
+          
+          <div>
+            <label for="guestPhone" class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-phone mr-1 text-primary"></i>Телефон
+            </label>
+            <input type="tel" id="guestPhone" name="guest_phone" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="+7 (999) 999-99-99">
+          </div>
+          
+          <!-- Кнопки -->
+          <div class="flex space-x-3 pt-2">
+            <button type="button" onclick="closeBookingModal()"
+                class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 transition">
+              Отмена
+            </button>
+            <button type="submit"
+                class="flex-1 bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md">
+              <i class="fas fa-check mr-1"></i>Подтвердить
+            </button>
+          </div>
+          
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Подвал -->
+<footer class="bg-gray-800 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h4 class="text-lg font-bold mb-4">Компания</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Компания и команда</a></li>
+          <li><a href="#" class="hover:text-white transition">Контакты</a></li>
+          <li><a href="#" class="hover:text-white transition">Вакансии</a></li>
+          <li><a href="#" class="hover:text-white transition">Для прессы</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Клиентам</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">База знаний</a></li>
+          <li><a href="#" class="hover:text-white transition">Служба поддержки</a></li>
+          <li><a href="#" class="hover:text-white transition">Блог о путешествиях</a></li>
+          <li><a href="#" class="hover:text-white transition">Популярные направления</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Партнёрам</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Объектам размещения</a></li>
+          <li><a href="#" class="hover:text-white transition">Турагентствам</a></li>
+          <li><a href="#" class="hover:text-white transition">Корпоративным клиентам</a></li>
+          <li><a href="#" class="hover:text-white transition">Рекламодателям</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="text-lg font-bold mb-4">Мы в соцсетях</h4>
+        <div class="flex space-x-4 mb-6">
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-telegram-plane"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-vk"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
+        
+        <h4 class="text-lg font-bold mb-4">Мобильные приложения</h4>
+        <div class="space-y-2">
+          <a href="#" class="block bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition">
+            <i class="fab fa-apple mr-2"></i>App Store
+          </a>
+          <a href="#" class="block bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition">
+            <i class="fab fa-google-play mr-2"></i>Google Play
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-700 pt-8 mt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <h4 class="font-bold mb-2">Безопасность платежей</h4>
+          <p class="text-gray-400 text-sm">Надёжная защита данных от ведущих платёжных систем.</p>
+        </div>
+        <div class="flex space-x-4">
+          <i class="fab fa-cc-visa text-3xl text-gray-400"></i>
+          <i class="fab fa-cc-mastercard text-3xl text-gray-400"></i>
+          <i class="fas fa-credit-card text-3xl text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-700 pt-6 mt-6 text-center text-gray-400 text-sm">
+      <p>&copy; 2026 Booking.ru. Все права защищены.</p>
+      <div class="mt-2 space-x-4">
+        <a href="#" class="hover:text-white transition">Политика конфиденциальности</a>
+        <a href="#" class="hover:text-white transition">Условия использования</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- JavaScript для модального окна и расчета стоимости -->
+<script>
+  // Глобальные переменные для модального окна
+  let currentRoomId = null;
+  let currentPricePerNight = 0;
+  
+  // Открытие модального окна
+  function openBookingModal(roomId, roomType, pricePerNight, roomNumber) {
+    currentRoomId = roomId;
+    currentPricePerNight = pricePerNight;
+    
+    // Обновляем информацию в модальном окне
+    document.getElementById('modalRoomInfo').textContent = 
+      `${roomType}, номер ${roomNumber}`;
+    document.getElementById('pricePerNight').textContent = 
+      `${new Intl.NumberFormat('ru-RU').format(pricePerNight)} ₽`;
+    
+    // Сбрасываем форму
+    document.getElementById('bookingForm').reset();
+    document.getElementById('guests').value = 2;
+    
+    // Устанавливаем минимальную дату сегодня
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkIn').min = today;
+    document.getElementById('checkOut').min = today;
+    
+    // Показываем модальное окно
+    document.getElementById('bookingModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Блокируем прокрутку фона
+  }
+  
+  // Закрытие модального окна
+  function closeBookingModal() {
+    document.getElementById('bookingModal').classList.add('hidden');
+    document.body.style.overflow = ''; // Восстанавливаем прокрутку
+  }
+  
+  // Расчет общей стоимости
+  function calculateTotal() {
+    const checkIn = document.getElementById('checkIn').value;
+    const checkOut = document.getElementById('checkOut').value;
+    const guests = parseInt(document.getElementById('guests').value) || 1;
+    
+    if (checkIn && checkOut) {
+      const startDate = new Date(checkIn);
+      const endDate = new Date(checkOut);
+      const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+      
+      if (nights > 0) {
+        const total = nights * currentPricePerNight;
+        document.getElementById('nightsCount').textContent = nights;
+        document.getElementById('totalPrice').textContent = 
+          `${new Intl.NumberFormat('ru-RU').format(total)} ₽`;
+        return;
+      }
+    }
+    
+    // Если даты не выбраны или некорректны
+    document.getElementById('nightsCount').textContent = '0';
+    document.getElementById('totalPrice').textContent = '0 ₽';
+  }
+  
+  // Обработчик отправки формы
+  document.getElementById('bookingForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Валидация дат
+    const checkIn = document.getElementById('checkIn').value;
+    const checkOut = document.getElementById('checkOut').value;
+    
+    if (!checkIn || !checkOut) {
+      alert('Пожалуйста, выберите даты заезда и выезда');
+      return;
+    }
+    
+    const startDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+    const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    
+    if (nights <= 0) {
+      alert('Дата выезда должна быть позже даты заезда');
+      return;
+    }
+    
+    // Здесь будет логика отправки данных на сервер
+    // Пока просто показываем сообщение
+    const guestName = document.getElementById('guestName').value;
+    const total = document.getElementById('totalPrice').textContent;
+    
+    alert(`✅ Бронирование оформлено!\n\n` +
+          `Номер: ${document.getElementById('modalRoomInfo').textContent}\n` +
+          `Гость: ${guestName}\n` +
+          `Даты: ${checkIn} — ${checkOut}\n` +
+          `Сумма: ${total}\n\n` +
+          `Дальнейшая логика будет реализована позже.`);
+    
+    closeBookingModal();
+  });
+  
+  // Закрытие модального окна по клавише Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeBookingModal();
+    }
+  });
+  
+  // Авто-расчет при изменении дат
+  document.getElementById('checkIn')?.addEventListener('change', calculateTotal);
+  document.getElementById('checkOut')?.addEventListener('change', calculateTotal);
+</script>
