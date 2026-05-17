@@ -356,22 +356,47 @@ end %>
           </div>
           
           <!-- Контактные данные -->
-          <div>
-            <label for="guestName" class="block text-sm font-medium text-gray-700 mb-1">
-              <i class="fas fa-user mr-1 text-primary"></i>ФИО гостя
-            </label>
-            <input type="text" id="guestName" name="guest_name" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="Иванов Иван Иванович">
-          </div>
-          
-          <div>
-            <label for="guestPhone" class="block text-sm font-medium text-gray-700 mb-1">
-              <i class="fas fa-phone mr-1 text-primary"></i>Телефон
-            </label>
-            <input type="tel" id="guestPhone" name="guest_phone" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="+7 (999) 999-99-99">
+          <div class="border-t border-gray-200 pt-5 mt-5">
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">
+              <i class="fas fa-user-circle mr-1 text-primary"></i>
+              Контактные данные гостя
+            </h4>
+            
+            <!-- ФИО -->
+            <div class="mb-4">
+              <label for="guestName" class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fas fa-user mr-1 text-primary"></i>ФИО гостя
+                <span class="text-red-500">*</span>
+              </label>
+              <input type="text" 
+                    id="guestName" 
+                    name="guest_name" 
+                    required
+                    minlength="3"
+                    maxlength="100"
+                    pattern="[a-zA-Zа-яА-Я\s\-]+"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Иванов Иван Иванович">
+              <p class="mt-1 text-xs text-gray-500">3-100 символов, только буквы и цифры</p>
+              <p class="mt-1 text-xs text-red-600 hidden" id="guestNameError"></p>
+            </div>
+            
+            <!-- Телефон -->
+            <div class="mb-4">
+              <label for="guestPhone" class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fas fa-phone mr-1 text-primary"></i>Телефон
+                <span class="text-red-500">*</span>
+              </label>
+              <input type="tel" 
+                    id="guestPhone" 
+                    name="guest_phone" 
+                    required
+                    pattern="\+?[0-9\-\(\) ]+"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="+7 (999) 999-99-99">
+              <p class="mt-1 text-xs text-gray-500">Формат: +7 (999) 999-99-99</p>
+              <p class="mt-1 text-xs text-red-600 hidden" id="guestPhoneError"></p>
+            </div>
           </div>
           
           <!-- Кнопки -->
@@ -543,10 +568,93 @@ end %>
   document.getElementById('bookingForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+    // Сбрасываем ошибки
+    const guestNameInput = document.getElementById('guestName');
+    const guestPhoneInput = document.getElementById('guestPhone');
+    const guestNameError = document.getElementById('guestNameError');
+    const guestPhoneError = document.getElementById('guestPhoneError');
     
-    // Валидация на клиенте
+    // Очищаем предыдущие ошибки
+    if (guestNameError) guestNameError.classList.add('hidden');
+    if (guestPhoneError) guestPhoneError.classList.add('hidden');
+    guestNameInput.classList.remove('border-red-500');
+    guestPhoneInput.classList.remove('border-red-500');
+    
+    let hasErrors = false;
+    
+    // Валидация ФИО
+    const guestName = guestNameInput.value.trim();
+    // Разбиваем на слова (убираем лишние пробелы)
+    const nameWords = guestName.split(/\s+/).filter(word => word.length > 0);
+    const namePattern = /^[a-zA-Zа-яА-Я0-9_\s]{3,100}$/;
+
+    if (!guestName) {
+      if (guestNameError) {
+        guestNameError.textContent = 'ФИО обязательно для заполнения';
+        guestNameError.classList.remove('hidden');
+      }
+      guestNameInput.classList.add('border-red-500');
+      hasErrors = true;
+    } else if (!namePattern.test(guestName)) {
+      if (guestNameError) {
+        guestNameError.textContent = 'ФИО может содержать только буквы и цифры';
+        guestNameError.classList.remove('hidden');
+      }
+      guestNameInput.classList.add('border-red-500');
+      hasErrors = true;
+    } else if (nameWords.length < 2) {
+      if (guestNameError) {
+        guestNameError.textContent = 'Пожалуйста, введите фамилию и имя (минимум 2 слова)';
+        guestNameError.classList.remove('hidden');
+      }
+      guestNameInput.classList.add('border-red-500');
+      hasErrors = true;
+    } else if (guestName.length < 5) {
+      if (guestNameError) {
+        guestNameError.textContent = 'ФИО должно содержать минимум 5 символов';
+        guestNameError.classList.remove('hidden');
+      }
+      guestNameInput.classList.add('border-red-500');
+      hasErrors = true;
+    } else {
+      // Проверяем длину каждого слова
+      const hasShortWord = nameWords.some(word => word.length < 2);
+      if (hasShortWord) {
+        if (guestNameError) {
+          guestNameError.textContent = 'Каждое слово должно содержать минимум 2 символа';
+          guestNameError.classList.remove('hidden');
+        }
+        guestNameInput.classList.add('border-red-500');
+        hasErrors = true;
+      }
+    }
+    
+    // Валидация телефона
+    const guestPhone = guestPhoneInput.value.trim();
+    const phonePattern = /^\+?[0-9\-\(\) ]{10,20}$/;
+    
+    if (!guestPhone) {
+      if (guestPhoneError) {
+        guestPhoneError.textContent = 'Телефон обязателен для заполнения';
+        guestPhoneError.classList.remove('hidden');
+      }
+      guestPhoneInput.classList.add('border-red-500');
+      hasErrors = true;
+    } else if (!phonePattern.test(guestPhone)) {
+      if (guestPhoneError) {
+        guestPhoneError.textContent = 'Введите телефон в корректном формате (например: +7 (999) 999-99-99)';
+        guestPhoneError.classList.remove('hidden');
+      }
+      guestPhoneInput.classList.add('border-red-500');
+      hasErrors = true;
+    }
+    
+    // Если есть ошибки, прекращаем выполнение
+    if (hasErrors) {
+      return;
+    }
+    
+    // Валидация дат
     const checkIn = document.getElementById('checkIn').value;
     const checkOut = document.getElementById('checkOut').value;
     
@@ -564,16 +672,22 @@ end %>
       return;
     }
     
-    // Показываем загрузку
+    // Отправка данных на сервер
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Состояние загрузки
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Бронируем...';
     
-    // Формируем данные
+    // Формирование данных для отправки
     const formData = {
       room_id: currentRoomId,
       check_in_date: checkIn,
       check_out_date: checkOut,
-      guests_count: document.getElementById('guests').value
+      guests_count: document.getElementById('guests').value,
+      guest_name: guestName,
+      guest_phone: guestPhone
     };
     
     // Отправляем AJAX запрос
@@ -588,19 +702,28 @@ end %>
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // Успех!
-        alert('✅ Бронирование успешно создано! Вы можете увидеть его в разделе "Мои бронирования".');
+        // Успешное бронирование
+        const guests = formData.guests_count;
+        let guestsText = 'гостей';
+        if (guests == 1) guestsText = 'гость';
+        else if (guests >= 2 && guests <= 4) guestsText = 'гостя';
+        
+        alert(`Бронирование успешно создано!\n\n` +
+              `Номер: ${document.getElementById('modalRoomInfo').textContent}\n` +
+              `Гость: ${guestName}\n` +
+              `Даты: ${checkIn} — ${checkOut}\n` +
+              `Гостей: ${guests} ${guestsText}\n` +
+              `Сумма: ${document.getElementById('totalPrice').textContent}\n\n` +
+              `Вы можете увидеть его в разделе "Мои бронирования".`);
         closeBookingModal();
-        // Опционально: можно скрыть кнопку бронирования или пометить номер как забронированный
-        // Но лучше просто дать пользователю перейти в профиль
       } else {
-        // Ошибка
-        alert('❌ Ошибка: ' + (data.errors ? data.errors.join(', ') : 'Не удалось забронировать'));
+        // Ошибка при бронировании
+        alert('Ошибка при бронировании:\n' + (data.errors ? data.errors.join('\n') : 'Не удалось забронировать'));
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('❌ Произошла ошибка сети. Попробуйте позже.');
+      alert('Произошла ошибка сети. Попробуйте позже.');
     })
     .finally(() => {
       // Возвращаем кнопку в исходное состояние

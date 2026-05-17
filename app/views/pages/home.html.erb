@@ -83,15 +83,15 @@
           Более 2 700 000 отелей по всему миру. Лучшие цены, мгновенное подтверждение 
           и круглосуточная поддержка. Найдите идеальный отель за несколько минут!
         </p>
-        <button class="bg-primary text-white text-xl font-bold px-10 py-4 rounded-full hover:bg-blue-700 transition shadow-xl transform hover:scale-105">
+        <%= link_to hotels_path, class: "bg-primary text-white text-xl font-bold px-10 py-4 rounded-full hover:bg-blue-700 transition shadow-xl transform hover:scale-105 inline-flex items-center" do %>
           <i class="fas fa-search mr-2"></i>ОТЕЛИ
-        </button>
+        <% end %>
       </div>
       
       <div class="flex-1 flex justify-center">
-        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop" 
-             alt="Hotel" 
-             class="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-300">
+        <%= image_tag "photo-main.jpg", 
+            alt: "Hotel", 
+            class: "rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-300" %>
       </div>
     </div>
   </div>
@@ -103,9 +103,9 @@
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div class="flex flex-col md:flex-row">
         <div class="md:w-1/3">
-          <img src="https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?w=400&h=400&fit=crop" 
-               alt="Island" 
-               class="w-full h-full object-cover">
+          <%= image_tag "photo-mail.jpg", 
+              alt: "Island", 
+              class: "w-full h-full object-cover" %>
         </div>
         <div class="md:w-2/3 p-8 md:p-12">
           <h2 class="text-3xl font-bold text-gray-800 mb-3">
