@@ -217,3 +217,193 @@ Payment.create!(
 )
 
 puts "Платежи созданы: #{Payment.count}"
+
+budget_hostel = Hotel.create!(
+  name: 'Бакпэк Хостел',
+  city: 'Казань',
+  country: 'Россия',
+  address: 'ул. Баумана 50',
+  stars: 2,
+  description: 'Веселый хостел в центре для молодых путешественников',
+  phone: '+78431234567',
+  visa_required: false
+)
+
+Room.create!(
+  hotel: budget_hostel,
+  room_number: 'Dorm-1',
+  room_type: 'Общий номер (8 мест)',
+  capacity: 8,
+  price_per_night: 1200.00,
+  description: 'Кровать в общем номере',
+  amenities: ['wifi', 'lockers'],
+  is_available: true
+)
+
+luxury_resort = Hotel.create!(
+  name: 'Роял Палас',
+  city: 'Дубай',
+  country: 'ОАЭ',
+  address: 'Sheikh Zayed Road',
+  stars: 5,
+  description: 'Ультра-люкс отель с私人 пляжем',
+  phone: '+97140000000',
+  visa_required: true
+)
+
+Room.create!(
+  hotel: luxury_resort,
+  room_number: 'VIP-101',
+  room_type: 'Президентский Люкс',
+  capacity: 2,
+  price_per_night: 50000.00,
+  description: 'Огромные апартаменты',
+  amenities: ['wifi', 'tv', 'ac', 'minibar', 'jacuzzi'],
+  is_available: true
+)
+
+family_hotel = Hotel.create!(
+  name: 'Солнечный Берег',
+  city: 'Анапа',
+  country: 'Россия',
+  address: 'Набережная 10',
+  stars: 3,
+  description: 'Отель для семейного отдыха с детьми',
+  phone: '+78612345678',
+  visa_required: false
+)
+
+Room.create!(
+  hotel: family_hotel,
+  room_number: 'Fam-1',
+  room_type: 'Семейный',
+  capacity: 4,
+  price_per_night: 4500.00,
+  description: 'Две комнаты, идеально для семьи',
+  amenities: ['wifi', 'tv', 'kitchen'],
+  is_available: true
+)
+
+puts "Дополнительные отели созданы."
+
+booking_dorm_1 = Booking.create!(
+  user: masha,
+  room: budget_hostel.rooms.first,
+  check_in_date: '2026-06-10',
+  check_out_date: '2026-06-15',
+  total_price: 6000.00, 
+  guests_count: 6,
+  status: 'confirmed'
+)
+
+booking_vip_1 = Booking.create!(
+  user: petr,
+  room: luxury_resort.rooms.first, 
+  check_in_date: '2026-07-20',
+  check_out_date: '2026-07-25',
+  total_price: 250000.00,
+  guests_count: 2,
+  status: 'confirmed'
+)
+
+booking_fam_1 = Booking.create!(
+  user: anna,
+  room: family_hotel.rooms.first,
+  check_in_date: '2026-08-01',
+  check_out_date: '2026-08-07',
+  total_price: 27000.00,
+  guests_count: 3,
+  status: 'pending'
+)
+
+booking_grand_1 = Booking.create!(
+  user: masha,
+  room: room1, 
+  check_in_date: '2026-06-05',
+  check_out_date: '2026-06-10',
+  total_price: 17500.00, 
+  guests_count: 2,
+  status: 'confirmed'
+)
+
+booking_cozy_1 = Booking.create!(
+  user: petr,
+  room: room5, 
+  check_in_date: '2026-06-15',
+  check_out_date: '2026-06-20',
+  total_price: 20000.00,
+  guests_count: 3,
+  status: 'confirmed'
+)
+
+booking_sea_1 = Booking.create!(
+  user: anna,
+  room: room6,
+  check_in_date: '2026-07-01',
+  check_out_date: '2026-07-05',
+  total_price: 32000.00, 
+  guests_count: 2,
+  status: 'pending'
+)
+
+puts "Дополнительные бронирования созданы: #{Booking.count}"
+
+# --- Платежи для новых бронирований ---
+
+Payment.create!(
+  booking: booking_dorm_1,
+  amount: 6000.00,
+  payment_method: 'card',
+  payment_status: 'paid',
+  paid_at: Time.current,
+  transaction_id: 'txn_dorm_001'
+)
+
+Payment.create!(
+  booking: booking_vip_1,
+  amount: 250000.00,
+  payment_method: 'card',
+  payment_status: 'paid',
+  paid_at: Time.current,
+  transaction_id: 'txn_vip_001'
+)
+
+Payment.create!(
+  booking: booking_fam_1,
+  amount: 27000.00,
+  payment_method: 'cash',
+  payment_status: 'pending',
+  paid_at: nil,
+  transaction_id: nil
+)
+
+Payment.create!(
+  booking: booking_grand_1,
+  amount: 17500.00,
+  payment_method: 'card',
+  payment_status: 'paid',
+  paid_at: Time.current,
+  transaction_id: 'txn_grand_002'
+)
+
+Payment.create!(
+  booking: booking_cozy_1,
+  amount: 20000.00,
+  payment_method: 'card',
+  payment_status: 'paid',
+  paid_at: Time.current,
+  transaction_id: 'txn_cozy_001'
+)
+
+Payment.create!(
+  booking: booking_sea_1,
+  amount: 32000.00,
+  payment_method: 'cash',
+  payment_status: 'pending',
+  paid_at: nil,
+  transaction_id: nil
+)
+
+puts "Платежи для новых бронирований созданы: #{Payment.count}"
+
+puts "\n ВСЕ ДАННЫЕ СОЗДАНЫ!"

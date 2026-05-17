@@ -24,7 +24,6 @@
       <!-- Кнопки входа/профиль -->
       <div class="flex items-center space-x-4">
         <% if logged_in? %>
-          <!-- Пользователь вошел -->
           <div class="relative inline-block group">
             <button class="flex items-center space-x-2 text-gray-700 hover:text-primary font-medium transition">
               <i class="fas fa-user-circle text-xl"></i>
@@ -33,7 +32,6 @@
             </button>
             
             <div class="absolute right-0 pt-2 invisible opacity-0 transition-all duration-200 ease-in-out group-hover:visible group-hover:opacity-100 hover:visible hover:opacity-100">
-              <!-- Выпадающее меню -->
               <div class="w-48 bg-white rounded-lg shadow-lg py-2">
                 <%= link_to bookings_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" do %>
                   <i class="fas fa-calendar-check mr-2"></i>Мои бронирования
@@ -52,7 +50,6 @@
             </div>
           </div>
         <% else %>
-          <!-- Пользователь не вошел -->
           <%= link_to login_path, class: "text-gray-700 hover:text-primary font-medium transition" do %>
             Войти
           <% end %>
@@ -65,126 +62,156 @@
   </div>
 </header>
 
-<!-- Основной блок -->
-<section class="bg-gradient-to-br from-green-400 via-green-300 to-cyan-300 py-16">
+<!-- Основной контент страницы отелей -->
+<main class="bg-gray-50 min-h-screen py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-8">
-      <h1 class="text-5xl md:text-6xl font-extrabold text-primary mb-4">
-        Ооооочень много отелей!
+    
+    <!-- Заголовок страницы -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900">
+        Все доступные отели
       </h1>
+      <p class="text-gray-600 mt-2">
+        Найдите идеальный отель для вашего путешествия
+      </p>
     </div>
     
-    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-      <div class="flex-1">
-        <p class="text-3xl md:text-4xl font-bold text-primary mb-8">
-          Забронировать отпуск поможет booking!
-        </p>
-        <p class="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl leading-relaxed">
-          Более 2 700 000 отелей по всему миру. Лучшие цены, мгновенное подтверждение 
-          и круглосуточная поддержка. Найдите идеальный отель за несколько минут!
-        </p>
-        <%= link_to hotels_path, class: "bg-primary text-white text-xl font-bold px-10 py-4 rounded-full hover:bg-blue-700 transition shadow-xl transform hover:scale-105 inline-flex items-center" do %>
-          <i class="fas fa-search mr-2"></i>ОТЕЛИ
-        <% end %>
-      </div>
-      
-      <div class="flex-1 flex justify-center">
-        <%= image_tag "photo-main.jpg", 
-            alt: "Hotel", 
-            class: "rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition duration-300" %>
-      </div>
+    <!-- Форма фильтрации -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <%= form_with url: hotels_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4" do |f| %>
+        <!-- Дата заезда -->
+        <div>
+          <%= label_tag :check_in, "Дата заезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= date_field_tag :check_in, @search_params[:check_in],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
+        </div>
+        <!-- Дата выезда -->
+        <div>
+          <%= label_tag :check_out, "Дата выезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= date_field_tag :check_out, @search_params[:check_out],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
+        </div>
+        <!-- Количество гостей -->
+        <div>
+          <%= label_tag :guests, "Гости", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= number_field_tag :guests, @search_params[:guests],
+            min: 1, max: 20, value: @search_params[:guests] || 2,
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
+        </div>
+        <!-- Кнопка поиска -->
+        <div class="flex items-end">
+          <%= submit_tag "Поиск",
+            class: "w-full bg-primary text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md cursor-pointer" %>
+        </div>
+      <% end %>
     </div>
-  </div>
-</section>
-
-<!-- Блок подписки -->
-<section class="bg-gray-100 py-16">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div class="flex flex-col md:flex-row">
-        <div class="md:w-1/3">
-          <%= image_tag "photo-mail.jpg", 
-              alt: "Island", 
-              class: "w-full h-full object-cover" %>
+    
+    <!-- Список отелей -->
+    <div class="space-y-6">
+      <% @hotels.each do |hotel| %>
+        <!-- Карточка отеля -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="flex flex-col md:flex-row">
+            
+            <!-- Левая часть: фото (заглушка) -->
+            <div class="md:w-1/3 lg:w-1/4">
+              <div class="h-48 md:h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <!-- Заглушка для фото -->
+                <div class="text-center p-4">
+                  <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
+                  <p class="text-sm text-gray-500">Фото отеля</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Правая часть: информация -->
+            <div class="flex-1 p-6">
+              
+              <!-- Название и звезды -->
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                <div>
+                  <h3 class="text-xl md:text-2xl font-bold text-gray-900">
+                    <%= hotel.name %>
+                  </h3>
+                  <p class="text-gray-600 mt-1">
+                    <i class="fas fa-map-marker-alt mr-1 text-primary"></i>
+                    <%= hotel.city %>, <%= hotel.country %>
+                  </p>
+                </div>
+                
+                <!-- Звезды -->
+                <div class="mt-2 sm:mt-0 flex items-center">
+                  <% hotel.stars.times do %>
+                    <i class="fas fa-star text-yellow-400"></i>
+                  <% end %>
+                  <% (5 - hotel.stars).times do %>
+                    <i class="far fa-star text-gray-300"></i>
+                  <% end %>
+                  <span class="ml-2 text-sm text-gray-500">(<%= hotel.stars %>)</span>
+                </div>
+              </div>
+              
+              <!-- Описание -->
+              <p class="text-gray-700 mb-4 line-clamp-2">
+                <%= hotel.description %>
+              </p>
+              
+              <!-- Адрес и телефон -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 text-sm">
+                <p class="text-gray-600">
+                  <i class="fas fa-home mr-2 text-gray-400"></i>
+                  <%= hotel.address %>
+                </p>
+                <p class="text-gray-600">
+                  <i class="fas fa-phone mr-2 text-gray-400"></i>
+                  <%= hotel.phone %>
+                </p>
+              </div>
+              
+              <!-- Бейдж визы -->
+              <% if hotel.visa_required %>
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
+                  <i class="fas fa-passport mr-1"></i>
+                  Требуется виза
+                </div>
+              <% end %>
+              
+              <!-- Кнопка "Показать все номера" -->
+              <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <span class="text-sm text-gray-500">
+                  <i class="fas fa-bed mr-1"></i>
+                  <%= @available_rooms_counts[hotel.hotel_id] %> номеров доступно
+                </span>
+                
+              <%= link_to logged_in? ? 
+                hotel_rooms_path(hotel, check_in: @search_params[:check_in], check_out: @search_params[:check_out], guests: @search_params[:guests]) : 
+                login_path(return_to: request.original_fullpath),
+              class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center" do %>
+                <i class="fas fa-door-open mr-2"></i>
+                Показать все номера
+              <% end %>
+              </div>
+              
+            </div>
+          </div>
         </div>
-        <div class="md:w-2/3 p-8 md:p-12">
-          <h2 class="text-3xl font-bold text-gray-800 mb-3">
-            Путешествуйте выгоднее!
-          </h2>
-          <p class="text-gray-600 mb-6">
-            Узнавайте первыми о выгодных ценах и спецпредложениях.
-          </p>
-          
-          <form class="flex flex-col sm:flex-row gap-3">
-            <input type="email" 
-                   placeholder="example@mail.ru" 
-                   class="flex-1 px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-            <button type="submit" 
-                    class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md">
-              Подписаться
-            </button>
-          </form>
-          
-          <label class="flex items-center mt-4 text-sm text-gray-600">
-            <input type="checkbox" class="mr-2 rounded border-gray-300 text-primary focus:ring-primary">
-            Я согласен получать рассылки с новостями, рекламой и спецпредложениями
-          </label>
-        </div>
-      </div>
+      <% end %>
     </div>
-  </div>
-</section>
-
-<!-- Фото блок -->
-<section class="py-16 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <%= image_tag "hotelsbrands.png", alt: "Hotel Brands", class: "w-full h-auto" %>
-  </div>
-</section>
-
-<!-- Блок преимущества -->
-<section class="py-16 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
-        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <i class="fas fa-ruble-sign text-2xl text-secondary"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">
-          Низкие цены
-        </h3>
-        <p class="text-gray-600 leading-relaxed">
-          Мы работаем напрямую с тысячами отелей, десятками поставщиков и можем контролировать цены на номера. Поэтому у нас всегда есть выгодные предложения на большинство направлений.
-        </p>
+    
+    <!-- Если отелей нет -->
+    <% if @hotels.empty? %>
+      <div class="text-center py-16">
+        <i class="fas fa-hotel text-6xl text-gray-300 mb-4"></i>
+        <p class="text-xl text-gray-600">Отели не найдены</p>
+        <p class="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
       </div>
-      
-      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
-        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-          <i class="fas fa-globe text-2xl text-primary"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">
-          Отели по всему миру
-        </h3>
-        <p class="text-gray-600 leading-relaxed">
-          У нас более 2700000 вариантов размещения по всему миру. Это отели, хостелы, апартаменты, виллы и даже кемпинги. В любой сезон вы найдёте то, что подходит именно вам.
-        </p>
-      </div>
-      
-      <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
-        <div class="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center mb-6">
-          <i class="fas fa-headset text-2xl text-accent"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">
-          Заботливая поддержка 24/7
-        </h3>
-        <p class="text-gray-600 leading-relaxed">
-          Операторы поддержки помогут с выбором отеля и бронированием. Если вопрос возник в поездке, оператор будет на связи и найдёт решение в кратчайший срок.
-        </p>
-      </div>
-    </div>
+    <% end %>
+    
   </div>
-</section>
+</main>
 
 <!-- Подвал -->
 <footer class="bg-gray-800 text-white py-12">

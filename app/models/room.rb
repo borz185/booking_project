@@ -23,4 +23,24 @@ class Room < ApplicationRecord
              check_in, check_out)
       .exists?
   end
+
+  # Класс-метод для поиска доступных номеров
+  # check_in_date, check_out_date - строки 'YYYY-MM-DD'
+  # guests - integer
+  def self.available_for_dates(check_in, check_out, guests)
+    # 1. Базовая фильтрация: номер должен быть доступен и вмещать гостей
+    query = where(is_available: true).where('capacity >= ?', guests)
+
+    # 2. Исключаем номера, которые уже забронированы на эти даты
+    # Бронь пересекается, если: (ЗаездБрони <= ВыездПоиска) И (ВыездБрони >= ЗаездПоиска)
+    busy_room_ids = Booking.where(status: ['pending', 'confirmed'])
+                           .where('check_in_date <= ? AND check_out_date >= ?', check_out, check_in)
+                           .pluck(:room_id)
+
+    if busy_room_ids.any?
+      query = query.where.not(room_id: busy_room_ids)
+    end
+
+    query
+  end
 end
