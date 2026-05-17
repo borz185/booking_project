@@ -103,6 +103,36 @@ end %>
         </span>
       <% end %>
     </div>
+
+    <% if @search_params[:check_in].present? %>
+      <div class="bg-white border-l-4 border-primary rounded-lg shadow-md p-4 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="flex items-center flex-wrap gap-3 text-sm">
+            <span class="text-gray-500">
+              <i class="fas fa-filter mr-1"></i> Поиск:
+            </span>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              <i class="fas fa-calendar-alt mr-1"></i>
+              <%= l Date.parse(@search_params[:check_in]), format: :short %>
+            </span>
+            <span class="text-gray-400">→</span>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              <i class="fas fa-calendar-check mr-1"></i>
+              <%= l Date.parse(@search_params[:check_out]), format: :short %>
+            </span>
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+              <i class="fas fa-users mr-1"></i>
+              <%= @search_params[:guests] %> <%= pluralize_ru(@search_params[:guests].to_i, 'гость', 'гостя', 'гостей') %>
+            </span>
+          </div>
+          <%= link_to hotel_rooms_path(@hotel), 
+              class: "text-red-600 hover:text-red-800 font-medium text-sm flex items-center transition" do %>
+            <i class="fas fa-times-circle mr-1"></i>
+            Сбросить
+          <% end %>
+        </div>
+      </div>
+    <% end %>
     
     <!-- Информация об отеле -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -120,106 +150,118 @@ end %>
     
     <!-- Список номеров -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @rooms.each do |room| %>
-        <!-- Карточка номера -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          
-          <!-- Фото номера (заглушка) -->
-          <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-            <i class="fas fa-door-open text-4xl text-gray-400"></i>
-          </div>
-          
-          <!-- Информация о номере -->
-          <div class="p-6">
+      <% if @rooms.any? %>
+        <% @rooms.each do |room| %>
+          <!-- Карточка номера -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
             
-            <!-- Название и номер -->
-            <div class="flex justify-between items-start mb-3">
-              <div>
-                <h3 class="text-lg font-bold text-gray-900"><%= room.room_type %></h3>
-                <p class="text-sm text-gray-500">Номер <%= room.room_number %></p>
-              </div>
-              <!-- Статус доступности -->
-              <% if room.is_available %>
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
-                  <i class="fas fa-check mr-1"></i>Свободен
-                </span>
-              <% else %>
-                <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">
-                  <i class="fas fa-times mr-1"></i>Занят
-                </span>
-              <% end %>
+            <!-- Фото номера (заглушка) -->
+            <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+              <i class="fas fa-door-open text-4xl text-gray-400"></i>
             </div>
             
-            <!-- Описание -->
-            <p class="text-gray-700 text-sm mb-4 line-clamp-2"><%= room.description %></p>
-            
-            <!-- Характеристики -->
-            <div class="space-y-2 mb-4">
-              <div class="flex items-center text-sm text-gray-600">
-                <i class="fas fa-users mr-2 text-primary w-4"></i>
-                <span>До <%= room.capacity %> <%= pluralize_ru(room.capacity, 'гостя', 'гостей', 'гостей') %></span>
+            <!-- Информация о номере -->
+            <div class="p-6">
+              
+              <!-- Название и номер -->
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900"><%= room.room_type %></h3>
+                  <p class="text-sm text-gray-500">Номер <%= room.room_number %></p>
+                </div>
+                <!-- Статус доступности -->
+                <% if room.is_available %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                    <i class="fas fa-check mr-1"></i>Свободен
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">
+                    <i class="fas fa-times mr-1"></i>Занят
+                  </span>
+                <% end %>
               </div>
-              <div class="flex items-center text-sm text-gray-600">
-                <i class="fas fa-ruble-sign mr-2 text-primary w-4"></i>
-                <span><%= number_to_currency(room.price_per_night, unit: "₽", precision: 0) %> / ночь</span>
-              </div>
-            </div>
-            
-            <!-- Услуги -->
-            <% if room.amenities.any? %>
-              <div class="mb-4">
-                <p class="text-xs text-gray-500 mb-2">Включено:</p>
-                <div class="flex flex-wrap gap-1">
-                  <% room.amenities.first(4).each do |amenity| %>
-                    <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                      <%= amenity %>
-                    </span>
-                  <% end %>
-                  <% if room.amenities.size > 4 %>
-                    <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                      +<%= room.amenities.size - 4 %> ещё
-                    </span>
-                  <% end %>
+              
+              <!-- Описание -->
+              <p class="text-gray-700 text-sm mb-4 line-clamp-2"><%= room.description %></p>
+              
+              <!-- Характеристики -->
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center text-sm text-gray-600">
+                  <i class="fas fa-users mr-2 text-primary w-4"></i>
+                  <span>До <%= room.capacity %> <%= pluralize_ru(room.capacity, 'гостя', 'гостей', 'гостей') %></span>
+                </div>
+                <div class="flex items-center text-sm text-gray-600">
+                  <i class="fas fa-ruble-sign mr-2 text-primary w-4"></i>
+                  <span><%= number_to_currency(room.price_per_night, unit: "₽", precision: 0) %> / ночь</span>
                 </div>
               </div>
-            <% end %>
-            
-            <!-- Кнопка забронировать -->
-            <% if room.is_available && logged_in? %>
-              <button type="button" 
-                  onclick="openBookingModal(<%= room.id %>, '<%= room.room_type %>', <%= room.price_per_night %>, '<%= room.room_number %>')"
-                  class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center">
-                <i class="fas fa-calendar-plus mr-2"></i>Забронировать
-              </button>
-            <% elsif room.is_available %>
-              <%= link_to login_path(return_to: request.original_fullpath), 
-                  class: "w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center" do %>
-                <i class="fas fa-sign-in-alt mr-2"></i>Войти для брони
+              
+              <!-- Услуги -->
+              <% if room.amenities.any? %>
+                <div class="mb-4">
+                  <p class="text-xs text-gray-500 mb-2">Включено:</p>
+                  <div class="flex flex-wrap gap-1">
+                    <% room.amenities.first(4).each do |amenity| %>
+                      <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                        <%= amenity %>
+                      </span>
+                    <% end %>
+                    <% if room.amenities.size > 4 %>
+                      <span class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                        +<%= room.amenities.size - 4 %> ещё
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
               <% end %>
-            <% else %>
-              <button disabled 
-                  class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg font-medium cursor-not-allowed flex items-center justify-center">
-                <i class="fas fa-lock mr-2"></i>Недоступен
-              </button>
-            <% end %>
-            
+              
+              <!-- Кнопка забронировать -->
+              <% if room.is_available && logged_in? %>
+                <button type="button" 
+                    onclick="openBookingModal(<%= room.room_id %>, '<%= room.room_type %>', <%= room.price_per_night %>, '<%= room.room_number %>')"
+                    class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center">
+                  <i class="fas fa-calendar-plus mr-2"></i>Забронировать
+                </button>
+              <% elsif room.is_available %>
+                <%= link_to login_path(return_to: request.original_fullpath), 
+                    class: "w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center" do %>
+                  <i class="fas fa-sign-in-alt mr-2"></i>Войти для брони
+                <% end %>
+              <% else %>
+                <button disabled 
+                    class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg font-medium cursor-not-allowed flex items-center justify-center">
+                  <i class="fas fa-lock mr-2"></i>Недоступен
+                </button>
+              <% end %>
+              
+            </div>
           </div>
+        <% end %>
+      <% else %>
+        <!-- Если номеров нет (показываем на всю ширину сетки) -->
+        <div class="col-span-full text-center py-16 bg-white rounded-xl shadow-md">
+          <i class="fas fa-bed text-6xl text-gray-300 mb-4"></i>
+          <p class="text-xl text-gray-600">
+            <% if @search_params[:check_in].present? %>
+              Нет свободных номеров на выбранные даты
+            <% else %>
+              В этом отеле пока нет доступных номеров
+            <% end %>
+          </p>
+          <p class="text-gray-500 mt-2">
+            <% if @search_params[:check_in].present? %>
+              Попробуйте изменить даты или количество гостей
+            <% else %>
+              Попробуйте выбрать другой отель
+            <% end %>
+          </p>
+          <%= link_to hotels_path, class: "mt-4 inline-block text-primary hover:underline" do %>
+            <i class="fas fa-arrow-left mr-1"></i>Вернуться к отелям
+          <% end %>
         </div>
       <% end %>
     </div>
-    
-    <!-- Если номеров нет -->
-    <% if @rooms.empty? %>
-      <div class="text-center py-16 bg-white rounded-xl shadow-md">
-        <i class="fas fa-bed text-6xl text-gray-300 mb-4"></i>
-        <p class="text-xl text-gray-600">В этом отеле пока нет доступных номеров</p>
-        <p class="text-gray-500 mt-2">Попробуйте выбрать другой отель</p>
-        <%= link_to hotels_path, class: "mt-4 inline-block text-primary hover:underline" do %>
-          <i class="fas fa-arrow-left mr-1"></i>Вернуться к отелям
-        <% end %>
-      </div>
-    <% end %>
-    
+
     <!-- Кнопка назад -->
     <div class="mt-8">
       <%= link_to hotels_path, class: "inline-flex items-center text-primary hover:underline" do %>

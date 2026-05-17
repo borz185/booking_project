@@ -79,37 +79,33 @@
     <!-- Форма фильтрации -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
       <%= form_with url: hotels_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4" do |f| %>
-        
         <!-- Дата заезда -->
         <div>
           <%= label_tag :check_in, "Дата заезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= date_field_tag :check_in, params[:check_in], 
-              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-              placeholder: "ДД.ММ.ГГГГ" %>
+          <%= date_field_tag :check_in, @search_params[:check_in],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
         </div>
-        
         <!-- Дата выезда -->
         <div>
           <%= label_tag :check_out, "Дата выезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= date_field_tag :check_out, params[:check_out], 
-              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-              placeholder: "ДД.ММ.ГГГГ" %>
+          <%= date_field_tag :check_out, @search_params[:check_out],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
         </div>
-        
         <!-- Количество гостей -->
         <div>
           <%= label_tag :guests, "Гости", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= number_field_tag :guests, params[:guests], 
-              min: 1, max: 20, value: params[:guests] || 2,
-              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+          <%= number_field_tag :guests, @search_params[:guests],
+            min: 1, max: 20, value: @search_params[:guests] || 2,
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+            required: true %>
         </div>
-        
         <!-- Кнопка поиска -->
         <div class="flex items-end">
-          <%= submit_tag "Поиск", 
-              class: "w-full bg-primary text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md cursor-pointer" %>
+          <%= submit_tag "Поиск",
+            class: "w-full bg-primary text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md cursor-pointer" %>
         </div>
-        
       <% end %>
     </div>
     
@@ -187,11 +183,13 @@
               <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                 <span class="text-sm text-gray-500">
                   <i class="fas fa-bed mr-1"></i>
-                  <%= hotel.rooms.count %> номеров доступно
+                  <%= @available_rooms_counts[hotel.hotel_id] %> номеров доступно
                 </span>
                 
-              <%= link_to logged_in? ? hotel_rooms_path(hotel) : login_path, 
-                  class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center" do %>
+              <%= link_to logged_in? ? 
+                hotel_rooms_path(hotel, check_in: @search_params[:check_in], check_out: @search_params[:check_out], guests: @search_params[:guests]) : 
+                login_path(return_to: request.original_fullpath),
+              class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center" do %>
                 <i class="fas fa-door-open mr-2"></i>
                 Показать все номера
               <% end %>

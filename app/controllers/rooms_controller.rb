@@ -3,7 +3,19 @@ class RoomsController < ApplicationController
   before_action :require_login, only: [:index]
   
   def index
-    @rooms = @hotel.rooms
+    # Если переданы параметры поиска — фильтруем номера
+    if params[:check_in].present? && params[:check_out].present? && params[:guests].present?
+      @rooms = Room.available_for_dates(
+        params[:check_in],
+        params[:check_out],
+        params[:guests].to_i
+      ).where(hotel_id: @hotel.hotel_id)
+      
+      @search_params = params.permit(:check_in, :check_out, :guests)
+    else
+      @rooms = @hotel.rooms
+      @search_params = {}
+    end
   end
   
   private
