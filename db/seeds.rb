@@ -218,9 +218,6 @@ Payment.create!(
 
 puts "Платежи созданы: #{Payment.count}"
 
-# --- Новые отели для теста фильтрации ---
-
-# 1. Хостел (дешевый, много мест)
 budget_hostel = Hotel.create!(
   name: 'Бакпэк Хостел',
   city: 'Казань',
@@ -236,37 +233,35 @@ Room.create!(
   hotel: budget_hostel,
   room_number: 'Dorm-1',
   room_type: 'Общий номер (8 мест)',
-  capacity: 8, # Большая вместимость
+  capacity: 8,
   price_per_night: 1200.00,
   description: 'Кровать в общем номере',
   amenities: ['wifi', 'lockers'],
   is_available: true
 )
 
-# 2. Люксовый отель (дорогой, мало мест)
 luxury_resort = Hotel.create!(
   name: 'Роял Палас',
-  city: 'Дубай', # Зарубежный отель
+  city: 'Дубай',
   country: 'ОАЭ',
   address: 'Sheikh Zayed Road',
   stars: 5,
   description: 'Ультра-люкс отель с私人 пляжем',
   phone: '+97140000000',
-  visa_required: true # Требует визу
+  visa_required: true
 )
 
 Room.create!(
   hotel: luxury_resort,
   room_number: 'VIP-101',
   room_type: 'Президентский Люкс',
-  capacity: 2, # Только для двоих
+  capacity: 2,
   price_per_night: 50000.00,
   description: 'Огромные апартаменты',
   amenities: ['wifi', 'tv', 'ac', 'minibar', 'jacuzzi'],
   is_available: true
 )
 
-# 3. Семейный отель
 family_hotel = Hotel.create!(
   name: 'Солнечный Берег',
   city: 'Анапа',
@@ -291,72 +286,62 @@ Room.create!(
 
 puts "Дополнительные отели созданы."
 
-# --- Бронирования для новых отелей ---
-
-# 1. Бронь на хостел (8 мест) — блокирует номер на 10-15 июня 2026
 booking_dorm_1 = Booking.create!(
   user: masha,
-  room: budget_hostel.rooms.first,  # Dorm-1 (capacity: 8)
+  room: budget_hostel.rooms.first,
   check_in_date: '2026-06-10',
   check_out_date: '2026-06-15',
-  total_price: 6000.00,  # 5 ночей * 1200₽
+  total_price: 6000.00, 
   guests_count: 6,
   status: 'confirmed'
 )
 
-# 2. Бронь на люкс в Дубае (2 места) — блокирует на 20-25 июля 2026
 booking_vip_1 = Booking.create!(
   user: petr,
-  room: luxury_resort.rooms.first,  # VIP-101 (capacity: 2)
+  room: luxury_resort.rooms.first, 
   check_in_date: '2026-07-20',
   check_out_date: '2026-07-25',
-  total_price: 250000.00,  # 5 ночей * 50000₽
+  total_price: 250000.00,
   guests_count: 2,
   status: 'confirmed'
 )
 
-# 3. Бронь на семейный номер (4 места) — блокирует на 1-7 августа 2026
 booking_fam_1 = Booking.create!(
   user: anna,
-  room: family_hotel.rooms.first,  # Fam-1 (capacity: 4)
+  room: family_hotel.rooms.first,
   check_in_date: '2026-08-01',
   check_out_date: '2026-08-07',
-  total_price: 27000.00,  # 6 ночей * 4500₽
+  total_price: 27000.00,
   guests_count: 3,
   status: 'pending'
 )
 
-# --- Дополнительные брони для оригинальных отелей (чтобы тестировать пересечения дат) ---
-
-# 4. Бронь на Гранд Отель, номер 101 (Эконом) — 5-10 июня 2026
 booking_grand_1 = Booking.create!(
   user: masha,
-  room: room1,  # Эконом, capacity: 2
+  room: room1, 
   check_in_date: '2026-06-05',
   check_out_date: '2026-06-10',
-  total_price: 17500.00,  # 5 ночей * 3500₽
+  total_price: 17500.00, 
   guests_count: 2,
   status: 'confirmed'
 )
 
-# 5. Бронь на Уютный Уголок, номер 102 (Стандарт, 3 места) — 15-20 июня 2026
 booking_cozy_1 = Booking.create!(
   user: petr,
-  room: room5,  # Стандарт, capacity: 3
+  room: room5, 
   check_in_date: '2026-06-15',
   check_out_date: '2026-06-20',
-  total_price: 20000.00,  # 5 ночей * 4000₽
+  total_price: 20000.00,
   guests_count: 3,
   status: 'confirmed'
 )
 
-# 6. Бронь на Sea View, номер 301 (Люкс) — 1-5 июля 2026
 booking_sea_1 = Booking.create!(
   user: anna,
-  room: room6,  # Люкс с видом на море, capacity: 2
+  room: room6,
   check_in_date: '2026-07-01',
   check_out_date: '2026-07-05',
-  total_price: 32000.00,  # 4 ночи * 8000₽
+  total_price: 32000.00, 
   guests_count: 2,
   status: 'pending'
 )
@@ -421,9 +406,4 @@ Payment.create!(
 
 puts "Платежи для новых бронирований созданы: #{Payment.count}"
 
-puts "\n✅ ВСЕ ДАННЫЕ СОЗДАНЫ!"
-puts "Теперь можно тестировать фильтрацию:"
-puts "  • 8 гостей + 10-15 июня → Бакпэк Хостел НЕ покажется (номер занят)"
-puts "  • 2 гостя + 20-25 июля → Роял Палас НЕ покажется (люкс занят)"
-puts "  • 4 гостя + 1-7 августа → Солнечный Берег НЕ покажется (семейный занят)"
-puts "  • 2 гостя + 5-10 июня → Гранд Отель покажет только Стандарт и Люкс (Эконом занят)"
+puts "\n ВСЕ ДАННЫЕ СОЗДАНЫ!"

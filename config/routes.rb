@@ -17,11 +17,11 @@ Rails.application.routes.draw do
   end
   
   # Бронирования
-    resources :bookings, only: [:index, :show] do
-      member do
-        post :cancel
-      end
+  resources :bookings, only: [:index, :show, :create] do
+    member do
+      post :cancel
     end
+  end
 
   # Основные разделы
   get "hotels", to: "pages#hotels"

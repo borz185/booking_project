@@ -217,18 +217,27 @@ end %>
               
               <!-- Кнопка забронировать -->
               <% if room.is_available && logged_in? %>
-                <button type="button" 
-                    onclick="openBookingModal(<%= room.room_id %>, '<%= room.room_type %>', <%= room.price_per_night %>, '<%= room.room_number %>')"
-                    class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center">
-                  <i class="fas fa-calendar-plus mr-2"></i>Забронировать
-                </button>
+                <% if room.hotel.visa_required && !current_user.has_visa %>
+                  <!-- Пользователь без визы, отель требует визу -->
+                  <div class="w-full bg-orange-100 text-orange-800 py-2 px-4 rounded-lg font-medium flex items-center justify-center cursor-not-allowed" 
+                      title="Этот отель требует визу">
+                    <i class="fas fa-passport mr-2"></i>Требуется виза
+                  </div>
+                <% else %>
+                  <!-- Пользователь с визой, можно бронировать -->
+                  <button type="button"
+                      onclick="openBookingModal(<%= room.room_id %>, '<%= room.room_type %>', <%= room.price_per_night %>, '<%= room.room_number %>')"
+                      class="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center">
+                    <i class="fas fa-calendar-plus mr-2"></i>Забронировать
+                  </button>
+                <% end %>
               <% elsif room.is_available %>
-                <%= link_to login_path(return_to: request.original_fullpath), 
+                <%= link_to login_path(return_to: request.original_fullpath),
                     class: "w-full bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition shadow-md flex items-center justify-center" do %>
                   <i class="fas fa-sign-in-alt mr-2"></i>Войти для брони
                 <% end %>
               <% else %>
-                <button disabled 
+                <button disabled
                     class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg font-medium cursor-not-allowed flex items-center justify-center">
                   <i class="fas fa-lock mr-2"></i>Недоступен
                 </button>
@@ -530,11 +539,14 @@ end %>
     document.getElementById('totalPrice').textContent = '0 ₽';
   }
   
-  // Обработчик отправки формы
+  // Обработчик отправки формы бронирования
   document.getElementById('bookingForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Валидация дат
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Валидация на клиенте
     const checkIn = document.getElementById('checkIn').value;
     const checkOut = document.getElementById('checkOut').value;
     
@@ -552,19 +564,49 @@ end %>
       return;
     }
     
-    // Здесь будет логика отправки данных на сервер
-    // Пока просто показываем сообщение
-    const guestName = document.getElementById('guestName').value;
-    const total = document.getElementById('totalPrice').textContent;
+    // Показываем загрузку
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Бронируем...';
     
-    alert(`✅ Бронирование оформлено!\n\n` +
-          `Номер: ${document.getElementById('modalRoomInfo').textContent}\n` +
-          `Гость: ${guestName}\n` +
-          `Даты: ${checkIn} — ${checkOut}\n` +
-          `Сумма: ${total}\n\n` +
-          `Дальнейшая логика будет реализована позже.`);
+    // Формируем данные
+    const formData = {
+      room_id: currentRoomId,
+      check_in_date: checkIn,
+      check_out_date: checkOut,
+      guests_count: document.getElementById('guests').value
+    };
     
-    closeBookingModal();
+    // Отправляем AJAX запрос
+    fetch('/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Успех!
+        alert('✅ Бронирование успешно создано! Вы можете увидеть его в разделе "Мои бронирования".');
+        closeBookingModal();
+        // Опционально: можно скрыть кнопку бронирования или пометить номер как забронированный
+        // Но лучше просто дать пользователю перейти в профиль
+      } else {
+        // Ошибка
+        alert('❌ Ошибка: ' + (data.errors ? data.errors.join(', ') : 'Не удалось забронировать'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('❌ Произошла ошибка сети. Попробуйте позже.');
+    })
+    .finally(() => {
+      // Возвращаем кнопку в исходное состояние
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    });
   });
   
   // Закрытие модального окна по клавише Escape
