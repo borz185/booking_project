@@ -1,6 +1,9 @@
 class Room < ApplicationRecord
   self.primary_key = 'room_id'
   
+  # Active Storage - несколько фото (до 3)
+  has_many_attached :photos
+
   # Валидации
   validates :room_number, presence: true
   validates :room_type, presence: true
@@ -8,6 +11,9 @@ class Room < ApplicationRecord
   validates :price_per_night, numericality: { greater_than: 0 }
   validates :hotel_id, presence: true
   
+  # Кастомная валидация для фото
+  validate :maximum_three_photos
+
   # Связи
   belongs_to :hotel, foreign_key: 'hotel_id', primary_key: 'hotel_id'
   has_many :bookings, foreign_key: 'room_id', primary_key: 'room_id', dependent: :restrict_with_error
@@ -42,5 +48,17 @@ class Room < ApplicationRecord
     end
 
     query
+  end
+
+  def has_photos?
+    photos.attached?
+  end
+  
+  private
+
+  def maximum_three_photos
+    if photos.attached? && photos.count > 3
+      errors.add(:photos, "можно загрузить не более 3 фотографий")
+    end
   end
 end

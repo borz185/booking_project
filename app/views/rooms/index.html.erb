@@ -156,8 +156,45 @@ end %>
           <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
             
             <!-- Фото номера (заглушка) -->
-            <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-              <i class="fas fa-door-open text-4xl text-gray-400"></i>
+            <!-- Фото номера с каруселью -->
+            <div class="relative h-48 bg-gray-200 overflow-hidden">
+              <% if room.has_photos? %>
+                <div class="carousel-container h-full" data-room-id="<%= room.room_id %>">
+                  <% room.photos.limit(3).each_with_index do |photo, index| %>
+                    <%= image_tag photo.variant(resize_to_fill: [600, 400]), 
+                          class: "carousel-item w-full h-full object-cover #{index == 0 ? 'active' : 'hidden'}",
+                          data: { index: index },
+                          alt: "#{room.room_type} - фото #{index + 1}" %>
+                  <% end %>
+                </div>
+                
+                <!-- Кнопки навигации -->
+                <% if room.photos.count > 1 %>
+                  <button type="button" 
+                          class="carousel-btn carousel-prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition"
+                          data-room-id="<%= room.room_id %>">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button type="button" 
+                          class="carousel-btn carousel-next absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-2 transition"
+                          data-room-id="<%= room.room_id %>">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                  
+                  <!-- Индикаторы -->
+                  <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    <% room.photos.limit(3).each_with_index do |_, index| %>
+                      <span class="carousel-indicator w-2 h-2 rounded-full bg-white bg-opacity-75 <%= index == 0 ? 'opacity-100' : 'opacity-50' %>"
+                            data-room-id="<%= room.room_id %>"
+                            data-index="<%= index %>"></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                  <i class="fas fa-door-open text-4xl text-gray-400"></i>
+                </div>
+              <% end %>
             </div>
             
             <!-- Информация о номере -->
@@ -742,4 +779,80 @@ end %>
   // Авто-расчет при изменении дат
   document.getElementById('checkIn')?.addEventListener('change', calculateTotal);
   document.getElementById('checkOut')?.addEventListener('change', calculateTotal);
+</script>
+
+<script>
+// Карусель для фото номеров
+document.addEventListener('DOMContentLoaded', function() {
+  // Инициализация всех каруселей
+  document.querySelectorAll('.carousel-container').forEach(container => {
+    const roomId = container.dataset.roomId;
+    initializeCarousel(roomId);
+  });
+});
+
+function initializeCarousel(roomId) {
+  const container = document.querySelector(`.carousel-container[data-room-id="${roomId}"]`);
+  if (!container) return;
+  
+  const items = container.querySelectorAll('.carousel-item');
+  const prevBtn = document.querySelector(`.carousel-prev[data-room-id="${roomId}"]`);
+  const nextBtn = document.querySelector(`.carousel-next[data-room-id="${roomId}"]`);
+  const indicators = document.querySelectorAll(`.carousel-indicator[data-room-id="${roomId}"]`);
+  
+  let currentIndex = 0;
+  
+  function showSlide(index) {
+    // Скрываем все слайды
+    items.forEach(item => item.classList.add('hidden'));
+    // Показываем текущий
+    items[index].classList.remove('hidden');
+    
+    // Обновляем индикаторы
+    indicators.forEach((indicator, i) => {
+      if (i === index) {
+        indicator.classList.remove('opacity-50');
+        indicator.classList.add('opacity-100');
+      } else {
+        indicator.classList.remove('opacity-100');
+        indicator.classList.add('opacity-50');
+      }
+    });
+    
+    currentIndex = index;
+  }
+  
+  function nextSlide() {
+    const nextIndex = (currentIndex + 1) % items.length;
+    showSlide(nextIndex);
+  }
+  
+  function prevSlide() {
+    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+    showSlide(prevIndex);
+  }
+  
+  // Обработчики событий
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      nextSlide();
+    });
+  }
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      prevSlide();
+    });
+  }
+  
+  // Клик по индикаторам
+  indicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showSlide(index);
+    });
+  });
+}
 </script>
