@@ -1,6 +1,9 @@
 class Hotel < ApplicationRecord
   self.primary_key = 'hotel_id'
   
+  # Active Storage - одно главное фото
+  has_one_attached :main_photo
+
   # Валидации
   validates :name, presence: true, length: { maximum: 150 }
   validates :city, presence: true
@@ -18,5 +21,10 @@ class Hotel < ApplicationRecord
   
   def average_price
     rooms.average(:price_per_night)
+  end
+
+  # Проверка наличия фото
+  def has_main_photo?
+    main_photo.attached?
   end
 end

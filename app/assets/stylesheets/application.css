@@ -1,1 +1,29 @@
 @import "font-awesome";
+
+/* Стили для карусели */
+.carousel-container {
+  position: relative;
+}
+
+.carousel-item {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.carousel-btn {
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+.carousel-container:hover .carousel-btn {
+  opacity: 1;
+}
+
+.carousel-btn:hover {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.carousel-indicator {
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
