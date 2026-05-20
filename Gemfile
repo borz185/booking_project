@@ -19,7 +19,7 @@ gem "jbuilder"
 
 gem 'tailwindcss-rails'
 
-gem 'font-awesome-sass', '~> 6.4.0'
+gem 'font-awesome-sass', '~> 6.7.2'
 
 gem 'kaminari'
 
