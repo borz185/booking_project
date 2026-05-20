@@ -19,4 +19,16 @@ class ApplicationController < ActionController::Base
   def admin?
     current_user&.role_admin?
   end
+
+    def require_login
+    unless logged_in?
+      redirect_to login_path, alert: "Пожалуйста, войдите для доступа к этой странице"
+    end
+  end
+  
+  def require_admin
+    unless logged_in? && admin?
+      redirect_to root_path, alert: "Доступ запрещен"
+    end
+  end
 end
