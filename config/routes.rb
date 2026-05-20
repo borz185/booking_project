@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
+  # Личный кабинет (сингулярный ресурс, так как привязан к current_user)
+  resource :profile, only: [:show, :edit, :update], controller: 'profiles'
+
   # Админка
   namespace :admin do
     root "admin#dashboard"
