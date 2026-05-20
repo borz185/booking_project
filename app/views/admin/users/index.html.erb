@@ -1,0 +1,136 @@
+<div class="bg-white rounded-lg shadow p-6">
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Управление пользователями</h1>
+</div>
+
+<div class="mb-4">
+  <%= link_to admin_root_path, class: "inline-flex items-center text-primary hover:underline" do %>
+    <i class="fas fa-arrow-left mr-2"></i>Вернуться на панель управления
+  <% end %>
+</div>
+
+<div class="flex justify-between items-center mb-6">
+  <div class="flex space-x-3">
+    <!-- Поиск -->
+    <%= form_with url: admin_users_path, method: :get, local: true, class: "flex space-x-2" do %>
+      <div class="relative">
+        <input type="text" 
+               name="search" 
+               value="<%= params[:search] %>" 
+               placeholder="Поиск по имени, email..."
+               class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary w-64">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+      <%= submit_tag "Найти", class: "bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition" %>
+      <% if params[:search].present? %>
+        <%= link_to "Сбросить", admin_users_path, class: "px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Статистика -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="flex items-center">
+      <div class="p-3 bg-purple-100 rounded-full">
+        <i class="fas fa-users text-2xl text-purple-600"></i>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-gray-500">Всего пользователей</p>
+        <p class="text-2xl font-bold text-gray-900"><%= @users.total_count %></p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="flex items-center">
+      <div class="p-3 bg-blue-100 rounded-full">
+        <i class="fas fa-user-shield text-2xl text-blue-600"></i>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-gray-500">Администраторы</p>
+        <p class="text-2xl font-bold text-gray-900"><%= User.where(role: 'admin').count %></p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="flex items-center">
+      <div class="p-3 bg-green-100 rounded-full">
+        <i class="fas fa-user-check text-2xl text-green-600"></i>
+      </div>
+      <div class="ml-4">
+        <p class="text-sm text-gray-500">Обычные пользователи</p>
+        <p class="text-2xl font-bold text-gray-900"><%= User.where(role: 'user').count %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Таблица пользователей -->
+<div class="bg-white rounded-xl shadow-md overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Пользователь</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Телефон</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Роль</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Виза</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Бронирований</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Дата регистрации</th>
+        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Действия</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm text-gray-500"><%= user.user_id %></td>
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-bold">
+                <%= user.username.first.upcase %>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-900"><%= user.username %></div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-600"><%= user.email %></td>
+          <td class="px-6 py-4 text-sm text-gray-600"><%= user.phone.presence || '—' %></td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-1 rounded-full text-xs font-medium
+              <%= user.role_admin? ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= user.role == 'admin' ? 'Администратор' : 'Пользователь' %>
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm">
+            <% if user.has_visa %>
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                <i class="fas fa-check mr-1"></i>Есть
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+                <i class="fas fa-times mr-1"></i>Нет
+              </span>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-600"><%= user.bookings.count %></td>
+          <td class="px-6 py-4 text-sm text-gray-500"><%= l user.created_at, format: :short %></td>
+            <td class="px-6 py-4 text-right">
+            <%= link_to "Просмотр бронирования", admin_user_path(user), 
+                class: "text-blue-600 hover:underline text-sm font-medium" %>
+            </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Пагинация -->
+<div class="mt-6 flex justify-center">
+  <%= paginate @users if defined?(paginate) %>
+</div>
+</div>
