@@ -1,0 +1,15 @@
+<div class="bg-white rounded-lg shadow p-6">
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Добавить новый отель</h1>
+</div>
+
+<div class="mb-4">
+  <%= link_to admin_hotels_path, class: "inline-flex items-center text-primary hover:underline" do %>
+    <i class="fas fa-arrow-left mr-2"></i>Вернуться к списку отелей
+  <% end %>
+</div>
+
+<div class="bg-white rounded-xl shadow-md p-6">
+  <%= render "form", hotel: @hotel %>
+</div>
+</div>

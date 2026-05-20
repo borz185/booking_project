@@ -33,6 +33,11 @@ end %>
             <i class="fas fa-calendar-check mr-1"></i>Бронирования
           <% end %>
         <% end %>
+        <% if admin? %>
+          <%= link_to admin_root_path, class: "text-purple-600 hover:text-purple-800 px-3 py-2 text-medium font-medium transition" do %>
+            <i class="fas fa-shield-alt mr-1"></i>Админка
+          <% end %>
+        <% end %>
       </nav>
       
       <!-- Кнопки входа/профиль -->

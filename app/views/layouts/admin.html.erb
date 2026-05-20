@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel - Booking.ru</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+  <!-- Админ шапка -->
+  <header class="bg-gray-800 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <%= link_to admin_root_path, class: "text-xl font-bold flex items-center" do %>
+            <i class="fas fa-shield-alt mr-2"></i>Admin Panel
+          <% end %>
+          <nav class="hidden md:flex space-x-4">
+            <%= link_to admin_hotels_path, class: "hover:text-blue-300 transition" do %>
+              <i class="fas fa-hotel mr-1"></i>Отели
+            <% end %>
+            <%= link_to admin_bookings_path, class: "hover:text-blue-300 transition" do %>
+              <i class="fas fa-calendar-check mr-1"></i>Бронирования
+            <% end %>
+            <%= link_to admin_users_path, class: "hover:text-blue-300 transition" do %>
+              <i class="fas fa-users mr-1"></i>Пользователи
+            <% end %>
+          </nav>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-300">
+            <i class="fas fa-user mr-1"></i><%= current_user.username %>
+          </span>
+          <%= link_to root_path, class: "text-sm hover:text-blue-300" do %>
+            <i class="fas fa-home mr-1"></i>На сайт
+          <% end %>
+          <%= button_to logout_path, method: :delete, class: "text-sm text-red-400 hover:text-red-300" do %>
+            <i class="fas fa-sign-out-alt mr-1"></i>Выйти
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <% if flash[:notice] %>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <!-- Основа -->
+  <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <%= yield %>
+  </main>
+
+  <!-- Футер -->
+  <footer class="bg-gray-800 text-gray-400 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+      &copy; 2026 Booking.ru Admin Panel
+    </div>
+  </footer>
+</body>
+</html>

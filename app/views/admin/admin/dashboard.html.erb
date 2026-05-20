@@ -1,0 +1,180 @@
+<div class="bg-white rounded-lg shadow p-6">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Панель управления</h1>
+    <p class="text-gray-600 mt-1">Обзор статистики и управление ресурсами</p>
+  </div>
+</div>
+
+<div class="mb-4">
+  <%= link_to root_path, class: "inline-flex items-center text-primary hover:underline" do %>
+    <i class="fas fa-arrow-left mr-2"></i>Вернуться на сайт
+  <% end %>
+</div>
+
+<!-- Сетка из 3-х основных карточек -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+  
+  <!-- Карточка 1: Отели и Номера -->
+  <%= link_to admin_hotels_path, class: "block group" do %>
+    <div class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition transform hover:-translate-y-0.5 h-full flex flex-col justify-between border-l-4 border-blue-500">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-200 transition">
+            <i class="fas fa-hotel text-xl"></i>
+          </div>
+          <i class="fas fa-chevron-right text-gray-300 group-hover:text-blue-500 transition"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-3">Отели и номера</h3>
+        
+        <div class="flex space-x-3 mb-4">
+          <div class="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+            <p class="text-xl font-bold text-blue-700"><%= @stats[:hotels_count] %></p>
+            <p class="text-xs text-blue-600 font-semibold">отелей</p>
+          </div>
+          <div class="flex-1 bg-green-50 rounded-lg p-2 text-center">
+            <p class="text-xl font-bold text-green-700"><%= @stats[:rooms_count] %></p>
+            <p class="text-xs text-green-600 font-semibold">номеров</p>
+          </div>
+        </div>
+      </div>
+      <div class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium text-sm text-center group-hover:bg-blue-700 transition mt-auto">
+        Управление отелями
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Карточка 2: Бронирования -->
+  <%= link_to admin_bookings_path, class: "block group" do %>
+    <div class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition transform hover:-translate-y-0.5 h-full flex flex-col justify-between border-l-4 border-yellow-500">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="p-2 bg-yellow-100 rounded-lg text-yellow-600 group-hover:bg-yellow-200 transition">
+            <i class="fas fa-calendar-check text-xl"></i>
+          </div>
+          <i class="fas fa-chevron-right text-gray-300 group-hover:text-yellow-500 transition"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-3">Бронирования</h3>
+        
+        <div class="bg-yellow-50 rounded-lg p-3 text-center mb-4">
+          <p class="text-3xl font-bold text-yellow-700"><%= @stats[:bookings_count] %></p>
+          <p class="text-xs text-yellow-600 font-semibold mt-1">всего бронирований</p>
+        </div>
+      </div>
+      <div class="w-full bg-yellow-500 text-white py-2 rounded-lg font-medium text-sm text-center group-hover:bg-yellow-600 transition mt-auto">
+        Все бронирования
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Карточка 3: Пользователи -->
+  <%= link_to admin_users_path, class: "block group" do %>
+    <div class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition transform hover:-translate-y-0.5 h-full flex flex-col justify-between border-l-4 border-purple-500">
+      <div>
+        <div class="flex justify-between items-start mb-3">
+          <div class="p-2 bg-purple-100 rounded-lg text-purple-600 group-hover:bg-purple-200 transition">
+            <i class="fas fa-users text-xl"></i>
+          </div>
+          <i class="fas fa-chevron-right text-gray-300 group-hover:text-purple-500 transition"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-3">Пользователи</h3>
+        
+        <div class="bg-purple-50 rounded-lg p-3 text-center mb-4">
+          <p class="text-3xl font-bold text-purple-700"><%= @stats[:users_count] %></p>
+          <p class="text-xs text-purple-600 font-semibold mt-1">всего пользователей</p>
+        </div>
+      </div>
+      <div class="w-full bg-purple-600 text-white py-2 rounded-lg font-medium text-sm text-center group-hover:bg-purple-700 transition mt-auto">
+        Управление пользователями
+      </div>
+    </div>
+  <% end %>
+
+</div>
+
+<!-- Последние бронирования -->
+<div class="bg-white rounded-xl shadow-md p-6 mb-8">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-gray-900">Последние бронирования</h2>
+    <%= link_to "Все бронирования", admin_bookings_path, class: "text-primary hover:underline" %>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b text-left text-sm text-gray-500">
+          <th class="pb-3">ID</th>
+          <th class="pb-3">Пользователь</th>
+          <th class="pb-3">Отель / Номер</th>
+          <th class="pb-3">Даты</th>
+          <th class="pb-3">Статус</th>
+          <th class="pb-3">Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stats[:recent_bookings].each do |booking| %>
+          <tr class="border-b last:border-0 hover:bg-gray-50">
+            <td class="py-3 text-sm"><%= booking.booking_id %></td>
+            <td class="py-3 text-sm"><%= booking.user.username %></td>
+            <td class="py-3 text-sm">
+              <%= booking.room.hotel.name %><br>
+              <span class="text-gray-500"><%= booking.room.room_number %> (<%= booking.room.room_type %>)</span>
+            </td>
+            <td class="py-3 text-sm">
+              <%= l booking.check_in_date, format: :short %> — <%= l booking.check_out_date, format: :short %>
+            </td>
+            <td class="py-3">
+              <span class="px-2 py-1 rounded-full text-xs font-medium
+                <%= case booking.status
+                    when 'confirmed' then 'bg-green-100 text-green-800'
+                    when 'pending' then 'bg-yellow-100 text-yellow-800'
+                    when 'cancelled' then 'bg-red-100 text-red-800'
+                    else 'bg-gray-100 text-gray-800'
+                    end %>">
+                <%= booking.status %>
+              </span>
+            </td>
+            <td class="py-3 text-sm font-medium"><%= number_to_currency(booking.total_price, unit: "₽") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Последние пользователи -->
+<div class="bg-white rounded-xl shadow-md p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-gray-900">Новые пользователи</h2>
+    <%= link_to "Все пользователи", admin_users_path, class: "text-primary hover:underline" %>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b text-left text-sm text-gray-500">
+          <th class="pb-3">ID</th>
+          <th class="pb-3">Имя</th>
+          <th class="pb-3">Email</th>
+          <th class="pb-3">Роль</th>
+          <th class="pb-3">Дата регистрации</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stats[:recent_users].each do |user| %>
+          <tr class="border-b last:border-0 hover:bg-gray-50">
+            <td class="py-3 text-sm"><%= user.user_id %></td>
+            <td class="py-3 text-sm font-medium"><%= user.username %></td>
+            <td class="py-3 text-sm"><%= user.email %></td>
+            <td class="py-3">
+              <span class="px-2 py-1 rounded-full text-xs font-medium
+                <%= user.role_admin? ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' %>">
+                <%= user.role %>
+              </span>
+            </td>
+            <td class="py-3 text-sm text-gray-500"><%= l user.created_at, format: :short %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
