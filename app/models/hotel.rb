@@ -11,6 +11,13 @@ class Hotel < ApplicationRecord
   validates :address, presence: true
   validates :stars, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }, allow_nil: true
   
+  validates :phone, 
+            format: { 
+              with: /\A[+0-9\s\-()]+\z/, 
+              message: "может содержать только цифры, +, скобки или дефисы" 
+            },
+            allow_blank: true
+
   # Связи
   has_many :rooms, foreign_key: 'hotel_id', primary_key: 'hotel_id', dependent: :destroy
   

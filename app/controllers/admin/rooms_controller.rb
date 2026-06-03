@@ -2,6 +2,7 @@ module Admin
   class RoomsController < AdminController
     before_action :set_hotel
     before_action :set_room, only: [:show, :edit, :update, :destroy]
+    skip_before_action :verify_authenticity_token, only: [:remove_photo]
     
     def index
       @rooms = @hotel.rooms
@@ -26,61 +27,82 @@ module Admin
       @room = @hotel.rooms.new
     end
     
-    def create
-      @room = @hotel.rooms.new(room_params.except(:amenities_input))
+def create
+  @room = @hotel.rooms.new(room_params.except(:amenities_input))
+  
+  if params[:room][:amenities_input].present?
+    @room.amenities = params[:room][:amenities_input].split(',').map(&:strip).reject(&:blank?)
+  end
+  
+  # Загружаем фото (максимум 3)
+  if params[:room][:photos].present?
+    uploaded_photos = params[:room][:photos].to_a.reject(&:blank?)
+    @room.photos.attach(uploaded_photos.first(3))
+  end
+  
+  if @room.save
+    redirect_to admin_hotel_rooms_path(@hotel), notice: "Номер успешно создан"
+  else
+    render :new, status: :unprocessable_entity
+  end
+end
+
+def update
+  @room.assign_attributes(room_params.except(:amenities_input))
+  
+  if params[:room][:amenities_input].present?
+    @room.amenities = params[:room][:amenities_input].split(',').map(&:strip).reject(&:blank?)
+  end
+  
+  # 🔹 При загрузке новых фото - старые удаляются автоматически
+  if params[:room][:photos].present?
+    uploaded_photos = params[:room][:photos].to_a.reject(&:blank?)
+    
+    if uploaded_photos.any?
+      # Удаляем ВСЕ старые фото
+      @room.photos.each(&:purge) if @room.photos.attached?
       
-      # Обработка удобств
-      if params[:room][:amenities_input].present?
-        amenities = params[:room][:amenities_input].split(',').map(&:strip).reject(&:blank?)
-        @room.amenities = amenities
-      end
-      
-      if @room.save
-        # Загрузка фото (максимум 3)
-        if params[:room][:photos].present?
-          params[:room][:photos].first(3).each do |photo|
-            @room.photos.attach(photo) if photo.present?
-          end
-        end
-        redirect_to admin_hotel_rooms_path(@hotel), notice: "Номер успешно создан"
-      else
-        render :new, status: :unprocessable_entity
-      end
+      # Прикрепляем новые (максимум 3)
+      @room.photos.attach(uploaded_photos.first(3))
     end
+  end
+  
+  if @room.save
+    redirect_to admin_hotel_rooms_path(@hotel), notice: "Номер успешно обновлен"
+  else
+    render :edit, status: :unprocessable_entity
+  end
+end
     
     def edit
-    end
-    
-    def update
-      @room.assign_attributes(room_params.except(:amenities_input))
-      
-      # Обновление удобств
-      if params[:room][:amenities_input].present?
-        amenities = params[:room][:amenities_input].split(',').map(&:strip).reject(&:blank?)
-        @room.amenities = amenities
-      end
-      
-      if @room.save
-        # Обновление фото
-        if params[:room][:photos].present?
-          @room.photos.purge_all
-          params[:room][:photos].first(3).each do |photo|
-            @room.photos.attach(photo) if photo.present?
-          end
-        end
-        redirect_to admin_hotel_rooms_path(@hotel), notice: "Номер успешно обновлен"
-      else
-        render :edit, status: :unprocessable_entity
-      end
     end
     
     def destroy
       @room.destroy
       redirect_to admin_hotel_rooms_path(@hotel), notice: "Номер удалён"
     end
+
+    # Удаление одной фотографии
+    def remove_photo
+      @room = @hotel.rooms.find(params[:id])
+      photo = @room.photos.find(params[:photo_id])
+      photo.purge
+      redirect_to edit_admin_hotel_room_path(@hotel, @room), notice: "Фотография удалена"
+    rescue ActiveRecord::RecordNotFound
+      redirect_to edit_admin_hotel_room_path(@hotel, @room), alert: "Фотография не найдена"
+    end
+    
+    # Удаление ВСЕХ фотографий
+    def clear_photos
+      @room = @hotel.rooms.find(params[:id])
+      @room.photos.purge_all
+      redirect_to edit_admin_hotel_room_path(@hotel, @room), notice: "Все фотографии удалены"
+    rescue ActiveRecord::RecordNotFound
+      redirect_to edit_admin_hotel_room_path(@hotel, @room), alert: "Номер не найден"
+    end
     
     private
-    
+
     def set_hotel
       @hotel = Hotel.find(params[:hotel_id])
     end
@@ -92,7 +114,7 @@ module Admin
     def room_params
       params.require(:room).permit(
         :room_number, :room_type, :capacity, :price_per_night,
-        :description, :is_available, :amenities_input, photos: []
+        :description, :is_available, :amenities_input
       )
     end
   end

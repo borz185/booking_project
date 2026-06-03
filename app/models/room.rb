@@ -12,7 +12,7 @@ class Room < ApplicationRecord
   validates :hotel_id, presence: true
   
   # Кастомная валидация для фото
-  validate :maximum_three_photos
+  # validate :maximum_three_photos
 
   # Связи
   belongs_to :hotel, foreign_key: 'hotel_id', primary_key: 'hotel_id'
@@ -56,9 +56,9 @@ class Room < ApplicationRecord
   
   private
 
-  def maximum_three_photos
-    if photos.attached? && photos.count > 3
-      errors.add(:photos, "можно загрузить не более 3 фотографий")
-    end
-  end
+  # def maximum_three_photos
+    # if photos.attached? && photos.count > 3
+      # errors.add(:photos, "можно загрузить не более 3 фотографий")
+    # end
+  # end
 end

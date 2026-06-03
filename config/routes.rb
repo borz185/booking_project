@@ -19,7 +19,9 @@ Rails.application.routes.draw do
     root "admin#dashboard"
     
     resources :hotels do
-      resources :rooms, only: [:index, :new, :create, :edit, :update, :destroy]
+      resources :rooms, only: [:index, :new, :create, :edit, :update, :destroy] do 
+
+      end
     end
     
     resources :bookings, only: [:index, :update, :destroy]

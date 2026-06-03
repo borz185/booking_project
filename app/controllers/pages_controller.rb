@@ -21,6 +21,8 @@ class PagesController < ApplicationController
       # 3. Загружаем отели
       @hotels = Hotel.where(hotel_id: hotel_ids)
       
+      @hotels = Hotel.where(hotel_id: hotel_ids).page(params[:page]).per(5)
+
       # 4. Считаем сколько номеров доступно в каждом отеле
       @hotels.each do |hotel|
         count = available_rooms.where(hotel_id: hotel.hotel_id).count
@@ -29,6 +31,7 @@ class PagesController < ApplicationController
       
       @search_params = params.permit(:check_in, :check_out, :guests)
     else
+      @hotels = Hotel.all.page(params[:page]).per(5)
       # Если поиска нет, показываем все отели и считаем все их номера
       @hotels = Hotel.all
       @hotels.each { |h| @available_rooms_counts[h.hotel_id] = h.rooms.count }
