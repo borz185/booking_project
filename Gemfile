@@ -17,6 +17,8 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+gem 'fiddle'
+
 gem 'tailwindcss-rails'
 
 gem 'font-awesome-sass', '~> 6.4.0'

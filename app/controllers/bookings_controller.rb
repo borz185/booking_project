@@ -14,15 +14,15 @@ class BookingsController < ApplicationController
 
   def cancel
     if @booking.user_id == current_user.user_id
-      if @booking.status == 'pending' || @booking.status == 'confirmed'
+      if @booking.status == 'pending'
         @booking.update(status: 'cancelled')
         redirect_to bookings_path, notice: "Бронирование отменено"
       else
-        redirect_to bookings_path, alert: "Невозможно отменить бронирование с текущим статусом"
+        redirect_to bookings_path, alert: "Невозможно отменить бронирование: оно уже #{@booking.status_i18n}"
       end
     else
       redirect_to bookings_path, alert: "Доступ запрещен"
-    end
+      end
   end
 
   # Новый метод создания бронирования (AJAX)
@@ -58,6 +58,8 @@ class BookingsController < ApplicationController
       )
 
       if booking.save
+
+
         render json: { success: true, booking_id: booking.booking_id }, status: :created
       else
         render json: { success: false, errors: booking.errors.full_messages }, status: :unprocessable_entity

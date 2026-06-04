@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   # Личный кабинет (сингулярный ресурс, так как привязан к current_user)
   resource :profile, only: [:show, :edit, :update], controller: 'profiles'
 
+  post '/subscribe', to: 'subscriptions#create', as: 'subscribe'
+
   # Админка
   namespace :admin do
     root "admin#dashboard"
@@ -24,8 +26,23 @@ Rails.application.routes.draw do
       end
     end
     
-    resources :bookings, only: [:index, :update, :destroy]
+    resources :bookings, only: [:index, :update] do 
+      member do
+        patch :update_status
+      end
+    end
+
+    # resources :bookings, only: [:index, :update, :destroy] do 
+      # member do
+        # patch :update_status
+      # end
+    # end
+
+    resources :earnings, only: [:index]
+
     resources :users, only: [:index, :show, :update, :destroy]
+
+    post 'newsletters/send', to: 'newsletters#send_message'
   end
 
   #Маршрут для номеров отеля

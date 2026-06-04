@@ -1,5 +1,7 @@
 module Admin
   class BookingsController < AdminController
+    before_action :set_booking, only: [:update_status, :destroy]
+    
     def index
       @bookings = Booking.includes(:user, room: :hotel)
       
@@ -30,18 +32,50 @@ module Admin
     def update
       @booking = Booking.find(params[:id])
       if @booking.update(status: params[:booking][:status])
-        # request.referer возвращает на страницу, откуда пришел запрос
         redirect_to request.referer || admin_bookings_path, notice: "Статус бронирования обновлен"
       else
         redirect_to request.referer || admin_bookings_path, alert: "Ошибка при обновлении"
       end
     end
+
+    def update_status
+      old_status = @booking.status
+      new_status = params[:status]
+      
+      if @booking.update(status: new_status)
+        if new_status == 'confirmed' || new_status == 'completed'
+          message = "Статус изменен на '#{booking_status_translation(new_status)}'. Доход: #{@booking.calculate_commission}₽"
+        elsif old_status == 'confirmed' || old_status == 'completed'
+          message = "Статус изменен на '#{booking_status_translation(new_status)}'. Доход удален."
+        else
+          message = "Статус изменен на '#{booking_status_translation(new_status)}'"
+        end
+        
+        redirect_to admin_bookings_path, notice: message
+      else
+        redirect_to admin_bookings_path, alert: "Не удалось изменить статус"
+      end
+    end
     
     def destroy
-      @booking = Booking.find(params[:id])
       @booking.destroy
-      # request.referer возвращает на страницу, откуда пришел запрос
       redirect_to request.referer || admin_bookings_path, notice: "Бронирование удалено"
     end
-  end
-end
+    
+    private
+    
+    def set_booking
+      @booking = Booking.find(params[:id])
+    end
+    
+    def booking_status_translation(status)
+      case status
+      when 'pending' then 'Ожидает подтверждения'
+      when 'confirmed' then 'Подтверждено'
+      when 'completed' then 'Завершено'
+      when 'cancelled' then 'Отменено'
+      else status
+      end
+    end
+  end  # ← end класса
+end  # ← end модуля

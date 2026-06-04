@@ -20,6 +20,7 @@ class Hotel < ApplicationRecord
 
   # Связи
   has_many :rooms, foreign_key: 'hotel_id', primary_key: 'hotel_id', dependent: :destroy
+  has_many :earnings, foreign_key: 'hotel_id', primary_key: 'hotel_id', dependent: :destroy
   
   # Методы
   def available_rooms

@@ -68,7 +68,7 @@ module Admin
     def hotel_params
       params.require(:hotel).permit(
         :name, :city, :country, :address, :stars, :description, 
-        :phone, :visa_required, :main_photo
+        :phone, :visa_required, :commission_rate, :main_photo
       )
     end
   end

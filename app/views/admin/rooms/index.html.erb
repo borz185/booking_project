@@ -4,12 +4,10 @@
     <h1 class="text-2xl font-bold text-gray-900">Номера отеля</h1>
     <p class="text-gray-600 mt-1"><%= @hotel.name %></p>
   </div>
-</div>
-
-<div class="mb-4">
-  <%= link_to admin_hotels_path, class: "inline-flex items-center text-primary hover:underline" do %>
-    <i class="fas fa-arrow-left mr-2"></i>Вернуться к отелям
-  <% end %>
+      <%= link_to admin_hotels_path, class: "inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition" do %>
+        <i class="fas fa-arrow-left mr-2"></i>
+        Вернуться к отелям
+      <% end %>
 </div>
 
 <div class="flex justify-between items-center mb-6">

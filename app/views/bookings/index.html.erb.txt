@@ -188,37 +188,41 @@
                 <!-- Статус бронирования -->
                 <div class="flex items-center justify-between">
                   <div class="flex items-center">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full <%= booking_status_badge_class(booking.status) %> text-sm font-medium">
-                      <% case booking.status %>
-                      <% when 'confirmed' %>
+                    <% case booking.status %>
+                    <% when 'confirmed' %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
                         <i class="fas fa-check-circle mr-1"></i>
-                      <% when 'pending' %>
+                        Подтверждено
+                      </span>
+                    <% when 'pending' %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm font-medium">
                         <i class="fas fa-clock mr-1"></i>
-                      <% when 'cancelled' %>
+                        Ожидает подтверждения
+                      </span>
+                    <% when 'cancelled' %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm font-medium">
                         <i class="fas fa-times-circle mr-1"></i>
-                      <% when 'completed' %>
+                        Отменено
+                      </span>
+                    <% when 'completed' %>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
                         <i class="fas fa-check-double mr-1"></i>
-                      <% end %>
-                      <%= booking_status_translation(booking.status) %>
-                    </span>
+                        Завершено
+                      </span>
+                    <% end %>
                   </div>
                   
                   <!-- Кнопки действий -->
-                  <!-- Кнопки действий -->
                   <div class="flex space-x-2">
-                    <% if booking.status == 'pending' %>
-                      <%= button_to cancel_booking_path(booking),
-                          method: :post,
+                    
+                    <% if booking.status == 'pending' || booking.status == 'confirmed' %>
+                      <%= button_to cancel_booking_path(booking), 
+                          method: :post, 
                           class: "px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition",
                           data: { confirm: "Вы уверены что хотите отменить бронирование?" } do %>
                         <i class="fas fa-times mr-1"></i>
                         Отменить
                       <% end %>
-                    <% elsif booking.status == 'confirmed' %>
-                      <span class="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed" title="Отмена невозможна после подтверждения администратором">
-                        <i class="fas fa-lock mr-1"></i>
-                        Нельзя отменить
-                      </span>
                     <% end %>
                   </div>
                 </div>

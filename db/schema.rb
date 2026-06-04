@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_18_202115) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_03_231207) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,9 +70,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_202115) do
     t.check_constraint "total_price > 0::numeric", name: "total_price_check"
   end
 
+  create_table "earnings", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.bigint "booking_id", null: false
+    t.decimal "commission_rate", precision: 5, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "earned_at", null: false
+    t.bigint "hotel_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id"], name: "index_earnings_on_booking_id"
+    t.index ["earned_at"], name: "index_earnings_on_earned_at"
+    t.index ["hotel_id"], name: "index_earnings_on_hotel_id"
+  end
+
   create_table "hotels", primary_key: "hotel_id", force: :cascade do |t|
     t.string "address", null: false
     t.string "city", null: false
+    t.decimal "commission_rate", precision: 5, scale: 2, default: "15.0", null: false
     t.string "country", null: false
     t.datetime "created_at", null: false
     t.text "description"
@@ -124,6 +138,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_202115) do
     t.check_constraint "price_per_night > 0::numeric", name: "price_check"
   end
 
+  create_table "subscribers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_subscribers_on_email", unique: true
+  end
+
   create_table "users", primary_key: "user_id", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -142,6 +163,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_202115) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bookings", "rooms", primary_key: "room_id"
   add_foreign_key "bookings", "users", primary_key: "user_id"
+  add_foreign_key "earnings", "bookings", primary_key: "booking_id"
+  add_foreign_key "earnings", "hotels", primary_key: "hotel_id"
   add_foreign_key "payments", "bookings", primary_key: "booking_id"
   add_foreign_key "rooms", "hotels", primary_key: "hotel_id"
 end
