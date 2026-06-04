@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 12px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo { color: #2563eb; font-size: 28px; font-weight: bold; }
+    .code-box { background: #f0f9ff; border: 2px solid #2563eb; border-radius: 12px; padding: 24px; text-align: center; margin: 30px 0; }
+    .code { font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 12px; font-family: monospace; }
+    .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; font-size: 14px; color: #92400e; }
+    .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo"> Booking.ru</div>
+      <h2 style="color: #1f2937; margin-top: 16px;">Восстановление пароля</h2>
+    </div>
+    
+    <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+      Здравствуйте! Вы запросили код для восстановления пароля на сайте Booking.ru.
+    </p>
+    
+    <div class="code-box">
+      <p style="color: #6b7280; margin: 0 0 12px 0; font-size: 14px;">Ваш код подтверждения:</p>
+      <div class="code"><%= @code %></div>
+    </div>
+    
+    <div class="warning">
+      <strong>️ Важно:</strong> Этот код действителен в течение <strong>10 минут</strong>. 
+      Не сообщайте его третьим лицам.
+    </div>
+    
+    <p style="color: #4b5563; font-size: 14px;">
+      Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.
+    </p>
+    
+    <div class="footer">
+      <p>© 2026 Booking.ru. Все права защищены.</p>
+      <p>Это автоматическое письмо, не отвечайте на него.</p>
+    </div>
+  </div>
+</body>
+</html>

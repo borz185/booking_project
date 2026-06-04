@@ -46,9 +46,9 @@
                 <% end %>
                 <% if admin? %>
                   <div class="border-t border-gray-200 my-1"></div>
-                  <span class="block px-4 py-2 text-sm text-gray-500">
-                    <i class="fas fa-shield-alt mr-2"></i>Админ: <%= current_user.role %>
-                  </span>
+                  <%= link_to admin_root_path, class: "block px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium transition" do %>
+                    <i class="fas fa-shield-alt mr-2"></i>Админ-панель
+                  <% end %>
                 <% end %>
                 <div class="border-t border-gray-200 my-1"></div>
                 <%= button_to logout_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100", form: { class: "w-full" } do %>
@@ -84,147 +84,353 @@
       </p>
     </div>
     
-    <!-- Форма фильтрации -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-      <%= form_with url: hotels_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4" do |f| %>
-        <!-- Дата заезда -->
-        <div>
-          <%= label_tag :check_in, "Дата заезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= date_field_tag :check_in, @search_params[:check_in],
-            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-            required: true %>
-        </div>
-        <!-- Дата выезда -->
-        <div>
-          <%= label_tag :check_out, "Дата выезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= date_field_tag :check_out, @search_params[:check_out],
-            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-            required: true %>
-        </div>
-        <!-- Количество гостей -->
-        <div>
-          <%= label_tag :guests, "Гости", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= number_field_tag :guests, @search_params[:guests],
-            min: 1, max: 20, value: @search_params[:guests] || 2,
-            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-            required: true %>
-        </div>
-        <!-- Кнопка поиска -->
-        <div class="flex items-end">
-          <%= submit_tag "Поиск",
-            class: "w-full bg-primary text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md cursor-pointer" %>
-        </div>
-      <% end %>
-    </div>
+<!-- Форма расширенной фильтрации -->
+<div class="bg-white rounded-xl shadow-md p-6 mb-8">
+  <%= form_with url: hotels_path, method: :get, local: true, class: "space-y-6" do %>
     
-    <!-- Список отелей -->
-    <div class="space-y-6">
-      <% @hotels.each do |hotel| %>
-        <!-- Карточка отеля -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-          <div class="flex flex-col md:flex-row">
-            
-            <!-- Левая часть: фото (заглушка) -->
-            <!-- Левая часть: фото отеля -->
-            <div class="md:w-1/3 lg:w-1/4">
-              <% if hotel.has_main_photo? %>
-                <%= image_tag hotel.main_photo.variant(resize_to_fill: [400, 300]), 
-                      class: "w-full h-48 md:h-full object-cover",
-                      alt: hotel.name %>
-              <% else %>
-                <div class="h-48 md:h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                  <div class="text-center p-4">
-                    <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
-                    <p class="text-sm text-gray-500">Фото отеля</p>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-            
-            <!-- Правая часть: информация -->
-            <div class="flex-1 p-6">
-              
-              <!-- Название и звезды -->
-              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
-                <div>
-                  <h3 class="text-xl md:text-2xl font-bold text-gray-900">
-                    <%= hotel.name %>
-                  </h3>
-                  <p class="text-gray-600 mt-1">
-                    <i class="fas fa-map-marker-alt mr-1 text-primary"></i>
-                    <%= hotel.city %>, <%= hotel.country %>
-                  </p>
-                </div>
-                
-                <!-- Звезды -->
-                <div class="mt-2 sm:mt-0 flex items-center">
-                  <% hotel.stars.times do %>
-                    <i class="fas fa-star text-yellow-400"></i>
-                  <% end %>
-                  <% (5 - hotel.stars).times do %>
-                    <i class="far fa-star text-gray-300"></i>
-                  <% end %>
-                  <span class="ml-2 text-sm text-gray-500">(<%= hotel.stars %>)</span>
-                </div>
-              </div>
-              
-              <!-- Описание -->
-              <p class="text-gray-700 mb-4 line-clamp-2">
-                <%= hotel.description %>
-              </p>
-              
-              <!-- Адрес и телефон -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 text-sm">
-                <p class="text-gray-600">
-                  <i class="fas fa-home mr-2 text-gray-400"></i>
-                  <%= hotel.address %>
-                </p>
-                <p class="text-gray-600">
-                  <i class="fas fa-phone mr-2 text-gray-400"></i>
-                  <%= hotel.phone %>
-                </p>
-              </div>
-              
-              <!-- Бейдж визы -->
-              <% if hotel.visa_required %>
-                <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
-                  <i class="fas fa-passport mr-1"></i>
-                  Требуется виза
-                </div>
-              <% end %>
-              
-              <!-- Кнопка "Показать все номера" -->
-              <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                <span class="text-sm text-gray-500">
-                  <i class="fas fa-bed mr-1"></i>
-                  <%= @available_rooms_counts[hotel.hotel_id] %> номеров доступно
-                </span>
-                
-              <%= link_to logged_in? ? 
-                hotel_rooms_path(hotel, check_in: @search_params[:check_in], check_out: @search_params[:check_out], guests: @search_params[:guests]) : 
-                login_path(return_to: request.original_fullpath),
-              class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center" do %>
-                <i class="fas fa-door-open mr-2"></i>
-                Показать все номера
-              <% end %>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-      <% end %>
+    <!-- Основные параметры (даты и гости) -->
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50 rounded-lg">
+      <div>
+        <%= label_tag :check_in, "Дата заезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= date_field_tag :check_in, @search_params[:check_in],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+      <div>
+        <%= label_tag :check_out, "Дата выезда", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= date_field_tag :check_out, @search_params[:check_out],
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+      <div>
+        <%= label_tag :guests, "Гости", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= number_field_tag :guests, @search_params[:guests] || 2,
+            min: 1, max: 20,
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
     </div>
-    
-    <!-- Если отелей нет -->
-    <% if @hotels.empty? %>
-      <div class="text-center py-16">
-        <i class="fas fa-hotel text-6xl text-gray-300 mb-4"></i>
-        <p class="text-xl text-gray-600">Отели не найдены</p>
-        <p class="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
+    <h3 class="text-sm font-semibold text-gray-700 mb-3">
+        <i class="fas fa-hotel mr-1"></i>Параметры отеля
+    </h3>
+    <!-- Фильтры по отелю -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <%= label_tag :hotel_name, "Название отеля", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_field_tag :hotel_name, @search_params[:hotel_name],
+            placeholder: "Например: Гранд",
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+      <div>
+        <%= label_tag :city, "Город", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_field_tag :city, @search_params[:city],
+            placeholder: "Например: Москва",
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+      <div>
+        <%= label_tag :country, "Страна", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_field_tag :country, @search_params[:country],
+            placeholder: "Например: Россия",
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+    </div>
+
+    <!-- Адрес и звёзды -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="md:col-span-2">
+        <%= label_tag :address, "Адрес", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_field_tag :address, @search_params[:address],
+            placeholder: "Улица, дом",
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+      <div>
+        <%= label_tag :stars, "Звёзды", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="flex space-x-1">
+          <% 1.upto(5) do |star| %>
+            <label class="cursor-pointer group relative">
+              <%= check_box_tag "stars[]", star, @search_params[:stars]&.include?(star.to_s),
+                  class: "sr-only star-checkbox",
+                  id: "star_#{star}" %>
+              <div class="star-icon text-2xl transition-all duration-200 text-gray-300 group-hover:text-yellow-300">
+                <i class="fas fa-star"></i>
+              </div>
+              <!-- Tooltip -->
+              <span class="absolute -top-8 left-1/2 transform -translate-x-1/2 
+                          bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 
+                          group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                <%= star %> <%= star == 1 ? 'звезда' : (star >= 2 && star <= 4 ? 'звезды' : 'звёзд') %>
+              </span>
+            </label>
+          <% end %>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+          <i class="fas fa-info-circle mr-1"></i>
+          Можно выбрать несколько категорий
+        </p>
+      </div>
+      <div>
+        <%= label_tag :visa_required, "Требуется виза", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= select_tag :visa_required,
+            options_for_select([['Все', 'all'], ['Не требуется', 'false'], ['Требуется', 'true']], @search_params[:visa_required]),
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+      </div>
+    </div>
+
+    <!-- Фильтры по номерам -->
+    <div class="border-t pt-4">
+      <h3 class="text-sm font-semibold text-gray-700 mb-3">
+        <i class="fas fa-bed mr-1"></i>Параметры номера
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <%= label_tag :room_type, "Тип номера", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= text_field_tag :room_type, @search_params[:room_type],
+              placeholder: "Эконом, Стандарт...",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+        <div>
+          <%= label_tag :min_price, "Цена от (₽)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= number_field_tag :min_price, @search_params[:min_price],
+              min: 0, step: 100,
+              placeholder: "0",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+        <div>
+          <%= label_tag :max_price, "Цена до (₽)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= number_field_tag :max_price, @search_params[:max_price],
+              min: 0, step: 100,
+              placeholder: "Не ограничено",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+        <div>
+          <%= label_tag :amenities, "Удобства", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= text_field_tag :amenities, @search_params[:amenities],
+              placeholder: "wifi, tv, ac, minibar",
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" %>
+          <p class="text-xs text-gray-500 mt-1">Через запятую</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="flex items-center justify-between pt-4">
+      <%= submit_tag "Поиск",
+          class: "bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md cursor-pointer" %>
+    </div>
+  <% end %>
+</div>
+
+    <!-- Отображение активных фильтров -->
+    <% if @search_params.values.any?(&:present?) %>
+      <div class="bg-blue-50 border-l-4 border-primary rounded-lg shadow-md p-4 mb-8">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-gray-500 font-medium">
+            <i class="fas fa-filter mr-1"></i> Активные фильтры:
+          </span>
+              
+          <% if @search_params[:check_in].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              <i class="fas fa-calendar-alt mr-1"></i>
+              Заезд: <%= l Date.parse(@search_params[:check_in]), format: :short %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:check_out].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              <i class="fas fa-calendar-check mr-1"></i>
+              Выезд: <%= l Date.parse(@search_params[:check_out]), format: :short %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:guests].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+              <i class="fas fa-users mr-1"></i>
+              <%= @search_params[:guests] %> гостей
+            </span>
+          <% end %>
+          
+          <% if @search_params[:hotel_name].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              Отель: <%= @search_params[:hotel_name] %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:city].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              Город: <%= @search_params[:city] %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:country].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              Страна: <%= @search_params[:country] %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:stars].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+              Звёзды: <%= @search_params[:stars].join(', ') %>★
+            </span>
+          <% end %>
+          
+          <% if @search_params[:room_type].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+              Тип: <%= @search_params[:room_type] %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:min_price].present? || @search_params[:max_price].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+              Цена: <%= @search_params[:min_price] || 0 %> - <%= @search_params[:max_price] || '∞' %> ₽
+            </span>
+          <% end %>
+          
+          <% if @search_params[:visa_required].present? && @search_params[:visa_required] != 'all' %>
+            <span class="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+              Виза: <%= @search_params[:visa_required] == 'true' ? 'требуется' : 'не требуется' %>
+            </span>
+          <% end %>
+          
+          <% if @search_params[:amenities].present? %>
+            <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+              Удобства: <%= @search_params[:amenities] %>
+            </span>
+          <% end %>
+          
+          <%= link_to hotels_path, class: "text-red-600 hover:text-red-800 font-medium text-sm flex items-center ml-auto" do %>
+            <i class="fas fa-times mr-1"></i>Сбросить
+          <% end %>
+        </div>
       </div>
     <% end %>
     
+  <!-- Список отелей -->
+  <div id="hotelsContainer" class="space-y-6">
+    <% @hotels.each do |hotel| %>
+      <!-- Карточка отеля -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition hotel-card" data-hotel-id="<%= hotel.hotel_id %>">
+        <div class="flex flex-col md:flex-row">
+          <!-- Левая часть: фото отеля -->
+          <div class="md:w-1/3 lg:w-1/4">
+            <% if hotel.has_main_photo? %>
+              <%= image_tag hotel.main_photo.variant(resize_to_fill: [400, 300]),
+                  class: "w-full h-48 md:h-full object-cover",
+                  alt: hotel.name %>
+            <% else %>
+              <div class="h-48 md:h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <div class="text-center p-4">
+                  <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
+                  <p class="text-sm text-gray-500">Фото отеля</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          <!-- Правая часть: информация -->
+          <div class="flex-1 p-6">
+            <!-- Название и звезды -->
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+              <div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-900">
+                  <%= hotel.name %>
+                </h3>
+                <p class="text-gray-600 mt-1">
+                  <i class="fas fa-map-marker-alt mr-1 text-primary"></i>
+                  <%= hotel.city %>, <%= hotel.country %>
+                </p>
+              </div>
+              <!-- Звезды -->
+              <div class="mt-2 sm:mt-0 flex items-center">
+                <% hotel.stars.times do %>
+                  <i class="fas fa-star text-yellow-400"></i>
+                <% end %>
+                <% (5 - hotel.stars).times do %>
+                  <i class="far fa-star text-gray-300"></i>
+                <% end %>
+                <span class="ml-2 text-sm text-gray-500">(<%= hotel.stars %>)</span>
+              </div>
+            </div>
+            <!-- Описание -->
+            <p class="text-gray-700 mb-4 line-clamp-2">
+              <%= hotel.description %>
+            </p>
+            <!-- Адрес и телефон -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 text-sm">
+              <p class="text-gray-600">
+                <i class="fas fa-home mr-2 text-gray-400"></i>
+                <%= hotel.address %>
+              </p>
+              <p class="text-gray-600">
+                <i class="fas fa-phone mr-2 text-gray-400"></i>
+                <%= hotel.phone %>
+              </p>
+            </div>
+            <!-- Бейдж визы -->
+            <% if hotel.visa_required %>
+              <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
+                <i class="fas fa-passport mr-1"></i>
+                Требуется виза
+              </div>
+            <% end %>
+            <!-- Кнопка "Показать все номера" -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+              <span class="text-sm text-gray-500">
+                <i class="fas fa-bed mr-1"></i>
+                <%= @available_rooms_counts[hotel.hotel_id] %> номеров доступно
+              </span>
+              <% 
+                # Собираем ВСЕ параметры для передачи на страницу номеров
+                room_params = {}
+                room_params[:check_in] = @search_params[:check_in] if @search_params[:check_in].present?
+                room_params[:check_out] = @search_params[:check_out] if @search_params[:check_out].present?
+                room_params[:guests] = @search_params[:guests] if @search_params[:guests].present?
+                room_params[:room_type] = @search_params[:room_type] if @search_params[:room_type].present?
+                room_params[:min_price] = @search_params[:min_price] if @search_params[:min_price].present?
+                room_params[:max_price] = @search_params[:max_price] if @search_params[:max_price].present?
+                room_params[:amenities] = @search_params[:amenities] if @search_params[:amenities].present?
+                room_params[:hotel_name] = @search_params[:hotel_name] if @search_params[:hotel_name].present?
+                room_params[:city] = @search_params[:city] if @search_params[:city].present?
+                room_params[:country] = @search_params[:country] if @search_params[:country].present?
+                room_params[:address] = @search_params[:address] if @search_params[:address].present?
+                room_params[:stars] = @search_params[:stars] if @search_params[:stars].present?
+                room_params[:visa_required] = @search_params[:visa_required] if @search_params[:visa_required].present?
+              %>
+              <%= link_to logged_in? ?
+                  hotel_rooms_path(hotel, room_params) :
+                  login_path(return_to: request.original_fullpath),
+                  class: "bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center" do %>
+                <i class="fas fa-door-open mr-2"></i>
+                Показать все номера
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
+
+  <!-- Кнопка "Показать еще" -->
+  <% if @hotels.current_page < @hotels.total_pages %>
+    <div class="text-center mt-8" id="loadMoreContainer">
+      <button type="button" 
+              id="loadMoreBtn"
+              data-next-page="<%= @hotels.current_page + 1 %>"
+              data-total-pages="<%= @hotels.total_pages %>"
+              class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md inline-flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Показать еще
+      </button>
+      <p class="text-sm text-gray-500 mt-2">
+        Страница <%= @hotels.current_page %> из <%= @hotels.total_pages %>
+      </p>
+    </div>
+  <% end %>
+
+  <!-- Если отелей нет -->
+  <% if @hotels.empty? %>
+    <div class="text-center py-16">
+      <i class="fas fa-hotel text-6xl text-gray-300 mb-4"></i>
+      <p class="text-xl text-gray-600">Отели не найдены</p>
+      <p class="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
+    </div>
+  <% end %>
 </main>
 
 <!-- Подвал -->
@@ -310,3 +516,160 @@
     </div>
   </div>
 </footer>
+
+<!-- JavaScript для подгрузки отелей -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const hotelsContainer = document.getElementById('hotelsContainer');
+  const loadMoreContainer = document.getElementById('loadMoreContainer');
+  
+  if (!loadMoreBtn) return;
+  
+  // Получаем текущие параметры URL для сохранения фильтров
+  function getSearchParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.toString();
+  }
+  
+  loadMoreBtn.addEventListener('click', async function() {
+    const nextPage = this.dataset.nextPage;
+    const totalPages = this.dataset.totalPages;
+    const searchParams = getSearchParams();
+    
+    // Показываем состояние загрузки
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Загрузка...';
+    
+    try {
+      const response = await fetch(`/hotels.json?page=${nextPage}${searchParams ? '&' + searchParams : ''}`);
+      
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки');
+      }
+      
+      const data = await response.json();
+      
+      if (data.hotels && data.hotels.length > 0) {
+        // Добавляем новые карточки
+        data.hotels.forEach(hotel => {
+          const cardHTML = createHotelCard(hotel);
+          hotelsContainer.insertAdjacentHTML('beforeend', cardHTML);
+        });
+        
+        // Обновляем счётчик страниц
+        this.dataset.nextPage = data.next_page;
+        
+        if (data.has_next) {
+          // Возвращаем кнопку в исходное состояние
+          this.disabled = false;
+          this.innerHTML = '<i class="fas fa-plus mr-2"></i>Показать еще';
+          // Обновляем текст страницы
+          const pageText = this.nextElementSibling;
+          if (pageText) {
+            pageText.textContent = `Страница ${data.current_page} из ${data.total_pages}`;
+          }
+        } else {
+          // Больше нет страниц - скрываем кнопку
+          loadMoreContainer.innerHTML = `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="text-green-800 text-sm font-medium">
+                <i class="fas fa-check-circle mr-1"></i>
+                Все отели загружены
+              </p>
+            </div>
+          `;
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+      this.disabled = false;
+      this.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Ошибка загрузки. Попробовать снова';
+    }
+  });
+  
+  // Функция создания HTML карточки отеля
+  function createHotelCard(hotel) {
+    const starsHTML = Array(hotel.stars).fill('<i class="fas fa-star text-yellow-400"></i>').join('') + 
+                      Array(5 - hotel.stars).fill('<i class="far fa-star text-gray-300"></i>').join('');
+    
+    const photoHTML = hotel.has_main_photo 
+      ? `<img src="${hotel.main_photo_url}" class="w-full h-48 md:h-full object-cover" alt="${hotel.name}">`
+      : `<div class="h-48 md:h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+           <div class="text-center p-4">
+             <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
+             <p class="text-sm text-gray-500">Фото отеля</p>
+           </div>
+         </div>`;
+    
+    const visaHTML = hotel.visa_required 
+      ? `<div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-medium mb-4">
+           <i class="fas fa-passport mr-1"></i>Требуется виза
+         </div>` 
+      : '';
+    
+    return `
+      <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition hotel-card" data-hotel-id="${hotel.id}">
+        <div class="flex flex-col md:flex-row">
+          <div class="md:w-1/3 lg:w-1/4">
+            ${photoHTML}
+          </div>
+          <div class="flex-1 p-6">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+              <div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-900">${hotel.name}</h3>
+                <p class="text-gray-600 mt-1">
+                  <i class="fas fa-map-marker-alt mr-1 text-primary"></i>
+                  ${hotel.city}, ${hotel.country}
+                </p>
+              </div>
+              <div class="mt-2 sm:mt-0 flex items-center">
+                ${starsHTML}
+                <span class="ml-2 text-sm text-gray-500">(${hotel.stars})</span>
+              </div>
+            </div>
+            <p class="text-gray-700 mb-4 line-clamp-2">${hotel.description}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 text-sm">
+              <p class="text-gray-600">
+                <i class="fas fa-home mr-2 text-gray-400"></i>
+                ${hotel.address}
+              </p>
+              <p class="text-gray-600">
+                <i class="fas fa-phone mr-2 text-gray-400"></i>
+                ${hotel.phone}
+              </p>
+            </div>
+            ${visaHTML}
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+              <span class="text-sm text-gray-500">
+                <i class="fas fa-bed mr-1"></i>
+                ${hotel.available_rooms_count} номеров доступно
+              </span>
+              <a href="/hotels/${hotel.id}/rooms?${getSearchParams()}" 
+                 class="bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-md inline-flex items-center">
+                <i class="fas fa-door-open mr-2"></i>
+                Показать все номера
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+});
+</script>
+
+<style>
+  .star-checkbox:checked + .star-icon {
+    color: #facc15; /* yellow-400 */
+    transform: scale(1.1);
+  }
+  
+  .star-checkbox:checked + .star-icon i {
+    color: #facc15;
+  }
+  
+  .star-checkbox:checked ~ .group:hover .star-icon {
+    color: #facc15;
+  }
+</style>

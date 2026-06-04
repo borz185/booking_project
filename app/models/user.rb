@@ -7,12 +7,12 @@ class User < ApplicationRecord
   before_save :strip_whitespace
 
   # Username: 3-50 символов, только буквы, цифры, пробелы, подчёркивания
-  validates :username, 
-    presence: true, 
+  validates :username,
+    presence: true,
     length: { minimum: 3, maximum: 50 },
-    format: { 
-      with: /\A[a-zA-Zа-яА-Я0-9_\s]+\z/, 
-      message: "может содержать только буквы, цифры, пробелы и подчёркивания" 
+    format: {
+      with: /\A[A-ZА-ЯЁ][a-zа-яё]+\s[A-ZА-ЯЁ][a-zа-яё]+\s[A-ZА-ЯЁ][a-zа-яё]+\z/,
+      message: "Должно состоять из трех слов через пробел, каждое с заглавной буквы, только буквы (например: Иванов Иван Иванович)"
     }
   
   # Email: строгая валидация с проверкой домена
@@ -21,20 +21,20 @@ class User < ApplicationRecord
     uniqueness: { case_sensitive: false, message: "уже зарегистрирован" },
     format: { 
       with: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i, 
-      message: "должен иметь корректный формат (example@domain.com)" 
+      message: "Должен иметь корректный формат (example@domain.com)" 
     },
     length: { maximum: 255 }
   
   # Пароль: минимум 6 символов (has_secure_password требует)
   validates :password, 
-    length: { minimum: 6, message: "должен быть не менее 6 символов" },
+    length: { minimum: 6, message: "Должен быть не менее 6 символов" },
     allow_nil: true
   
   # Телефон: формат +7 или 8
   validates :phone, 
     format: { 
       with: /\A(\+7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}\z/, 
-      message: "должен быть в формате +7 (999) 999-99-99" 
+      message: "Должен быть в формате +7 (999) 999-99-99" 
     },
     allow_blank: true
   

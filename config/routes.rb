@@ -11,6 +11,12 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
+  # Восстановление пароля
+  get "forgot-password", to: "password_resets#new", as: "forgot_password"
+  post "forgot-password/send-code", to: "password_resets#send_code", as: "send_reset_code"
+  post "forgot-password/verify-code", to: "password_resets#verify_code", as: "verify_reset_code"
+  post "forgot-password/update-password", to: "password_resets#update_password", as: "update_reset_password"
+
   # Личный кабинет (сингулярный ресурс, так как привязан к current_user)
   resource :profile, only: [:show, :edit, :update], controller: 'profiles'
 
