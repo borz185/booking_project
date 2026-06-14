@@ -1,17 +1,18 @@
 databases:
   - name: booking-app-db
     plan: free
+    region: frankfurt  # Убедитесь, что регион совпадает с регионом вашего веб-сервиса!
 
 services:
   - type: web
     plan: free
     name: booking-app
     runtime: ruby
-    repo: https://github.com/borz185/booking_project.git
-    branch: main  # или master, если основная ветка называется master
-
+    repo: https://github.com/borz185/booking_project # Ваш URL репозитория
+    branch: main
     buildCommand: "./bin/render-build.sh"
     startCommand: "bundle exec rails server"
+    region: frankfurt # Регион должен совпадать с регионом базы данных![reference:3]
 
     envVars:
       - key: DATABASE_URL
