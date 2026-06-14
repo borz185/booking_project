@@ -5,26 +5,12 @@ default: &default
 
 development:
   <<: *default
-  database: booking_project_development
-  username: postgres
-  password: vova
-  host: localhost
-  port: 5432
+  database: your_app_name_development
 
 test:
   <<: *default
-  database: booking_project_test
-  username: postgres
-  password: vova
-  host: localhost
-  port: 5432
+  database: your_app_name_test
 
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
-
-#production:
-  #<<: *default
-  #database: booking_project_production
-  #username: booking_project
-  #password: <%= ENV["BOOKING_PROJECT_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>   # <--- ВАЖНО: эта строчка ДОЛЖНА БЫТЬ
