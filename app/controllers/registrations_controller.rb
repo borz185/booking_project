@@ -15,6 +15,14 @@ class RegistrationsController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+    rescue ActiveRecord::RecordNotUnique => e
+    # Обработка ошибки уникальности
+    if e.message.include?('index_users_on_username')
+      @user.errors.add(:username, 'Уже зарегистрирован')
+    elsif e.message.include?('index_users_on_email')
+      @user.errors.add(:email, 'Уже зарегистрирован')
+    end
+    render :new, status: :unprocessable_entity
   end
   
   private

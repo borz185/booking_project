@@ -77,16 +77,33 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   config.hosts << /.*\.ngrok-free\.dev/
 
+  # Разрешить ngrok домены
+  config.hosts << /[a-z0-9\-]+\.ngrok-free\.dev/
+  config.hosts << /[a-z0-9\-]+\.ngrok\.io/
+  config.hosts << /[a-z0-9\-]+\.ngrok-free\.app/
+  
+  # Или явно ваш домен:
+  config.hosts << "geri-emulsive-erma.ngrok-free.dev"
+  
+  # Для ActionMailer - чтобы ссылки в письмах работали через ngrok
+  config.action_mailer.default_url_options = { 
+    host: 'geri-emulsive-erma.ngrok-free.dev', 
+    protocol: 'https' 
+  }
+  
+  # Для SSL через ngrok
+  config.force_ssl = false
+
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
   address: 'smtp.yandex.ru',
-  port: 587,                               # ← Другой порт
+  port: 587,                               
   domain: 'yandex.ru',
   authentication: :login,
   user_name: 'vladimir.borz.185@yandex.ru',
   password: 'regtbniudttlrxku',
-  enable_starttls_auto: true,              # ← Только это!
-  # ssl: true,                             # ← УБРАТЬ!
+  enable_starttls_auto: true,              
+  # ssl: true,                             
   openssl_verify_mode: 'none',
   open_timeout: 15,
   read_timeout: 15

@@ -9,6 +9,7 @@ class User < ApplicationRecord
   # Username: 3-50 символов, только буквы, цифры, пробелы, подчёркивания
   validates :username,
     presence: true,
+    uniqueness: { case_sensitive: false, message: "Уже зарегистрирован" },
     length: { minimum: 3, maximum: 50 },
     format: {
       with: /\A[A-ZА-ЯЁ][a-zа-яё]+\s[A-ZА-ЯЁ][a-zа-яё]+\s[A-ZА-ЯЁ][a-zа-яё]+\z/,
@@ -18,7 +19,7 @@ class User < ApplicationRecord
   # Email: строгая валидация с проверкой домена
   validates :email, 
     presence: true, 
-    uniqueness: { case_sensitive: false, message: "уже зарегистрирован" },
+    uniqueness: { case_sensitive: false, message: "Уже зарегистрирован" },
     format: { 
       with: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i, 
       message: "Должен иметь корректный формат (example@domain.com)" 
