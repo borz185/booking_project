@@ -9,7 +9,7 @@ puts "Данные очищены..."
 
 # Пользователи
 admin = User.create!(
-  username: 'admin',
+  username: 'Админ Букинг Владимир',
   email: 'admin@hotel.com',
   password: 'password123',
   password_confirmation: 'password123',
@@ -19,7 +19,7 @@ admin = User.create!(
 )
 
 masha = User.create!(
-  username: 'mashylkaaaa',
+  username: 'Апостолова Мария Ильинична',
   email: 'masha@example.com',
   password: 'password123',
   password_confirmation: 'password123',
@@ -29,7 +29,7 @@ masha = User.create!(
 )
 
 petr = User.create!(
-  username: 'petrovich',
+  username: 'Петров Петр Петрович',
   email: 'petr@example.com',
   password: 'password123',
   password_confirmation: 'password123',
@@ -39,7 +39,7 @@ petr = User.create!(
 )
 
 anna = User.create!(
-  username: 'anna_smith',
+  username: 'Стародубцева Анна Александровна',
   email: 'anna@example.com',
   password: 'password123',
   password_confirmation: 'password123',
