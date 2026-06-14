@@ -1,0 +1,24 @@
+databases:
+  - name: booking-app-db
+    plan: free
+
+services:
+  - type: web
+    plan: free
+    name: booking-app
+    runtime: ruby
+    repo: https://github.com/borz185/booking_project.git
+    branch: main  # или master, если основная ветка называется master
+
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec rails server"
+
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: booking-app-db
+          property: connectionString
+      - key: SECRET_KEY_BASE
+        sync: false
+      - key: RAILS_MASTER_KEY
+        sync: false
